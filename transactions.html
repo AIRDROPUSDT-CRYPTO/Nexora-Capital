@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transactions | Quantum Apex Ug</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:linear-gradient(135deg,#020617,#020617,#0f172a);
+  color:#fff;
+}
+
+/* TOPBAR */
+.topbar{
+  padding:15px;
+  text-align:center;
+  font-weight:600;
+  background:rgba(15,23,42,0.7);
+  backdrop-filter:blur(10px);
+}
+
+/* CONTAINER */
+.container{
+  padding:20px;
+}
+
+/* CARD */
+.card{
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  padding:16px;
+  border-radius:16px;
+  margin-bottom:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  display:flex;
+  justify-content:space-between;
+  animation:fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+.left{
+  display:flex;
+  gap:12px;
+}
+
+.icon{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.deposit-icon{
+  background:rgba(34,197,94,0.15);
+  color:#22c55e;
+}
+
+.withdraw-icon{
+  background:rgba(56,189,248,0.15);
+  color:#38bdf8;
+}
+
+.title{
+  font-weight:600;
+}
+
+.date{
+  font-size:12px;
+  color:#94a3b8;
+}
+
+/* TRANSACTION ID */
+.txid{
+  font-size:11px;
+  color:#64748b;
+  margin-top:4px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* COPY BUTTON */
+.copy-btn{
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:6px;
+  background:#1e293b;
+  cursor:pointer;
+}
+
+/* RIGHT */
+.right{
+  text-align:right;
+}
+
+.amount{
+  font-weight:600;
+}
+
+.status{
+  font-size:11px;
+  margin-top:4px;
+  padding:3px 8px;
+  border-radius:10px;
+  background:rgba(34,197,94,0.15);
+  color:#22c55e;
+}
+
+/* POPUP */
+.popup{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0.8);
+  background:#020617;
+  padding:18px 25px;
+  border-radius:12px;
+  opacity:0;
+  transition:0.3s;
+  z-index:1000;
+}
+
+.popup.show{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+}
+
+.popup.success{
+  border:2px solid #22c55e;
+}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  margin-top:60px;
+  color:#64748b;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">Transaction History</div>
+
+<div class="container" id="historyContainer">
+  <div class="empty">No transactions yet</div>
+</div>
+
+<div id="popup" class="popup"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
+  authDomain: "betpawa-6ef7e.firebaseapp.com",
+  databaseURL: "https://betpawa-6ef7e-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "betpawa-6ef7e",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+const container = document.getElementById("historyContainer");
+
+/* FORMAT */
+const formatDate = t => new Date(t).toLocaleString();
+const formatMoney = a => Number(a).toLocaleString() + " UGX";
+
+/* GENERATE SHORT ID */
+function shortId(id){
+  return "TX-" + id.slice(-6).toUpperCase();
+}
+
+/* COPY */
+window.copyId = function(id){
+  navigator.clipboard.writeText(id);
+  showPopup("Transaction ID copied");
+}
+
+/* POPUP */
+function showPopup(msg){
+  const p = document.getElementById("popup");
+  p.innerText = msg;
+  p.className = "popup show success";
+  setTimeout(()=>p.classList.remove("show"),2000);
+}
+
+/* TRACK NOTIFICATIONS */
+let shown = new Set();
+
+/* RENDER */
+function render(transactions){
+  container.innerHTML = "";
+
+  if(transactions.length === 0){
+    container.innerHTML = '<div class="empty">No transactions yet</div>';
+    return;
+  }
+
+  transactions.sort((a,b)=>b.createdAt - a.createdAt);
+
+  transactions.forEach(tx => {
+
+    let div = document.createElement("div");
+    div.className = "card";
+
+    let id = shortId(tx.id);
+
+    /* NOTIFICATION (ONLY ONCE) */
+    if(!shown.has(tx.id)){
+      shown.add(tx.id);
+      showPopup(
+        tx.type === "deposit"
+        ? "Deposit approved"
+        : "Withdrawal successful"
+      );
+    }
+
+    div.innerHTML = `
+      <div class="left">
+        <div class="icon ${tx.type === 'deposit' ? 'deposit-icon':'withdraw-icon'}">
+          ${tx.type === 'deposit' ? '⬇':'⬆'}
+        </div>
+
+        <div>
+          <div class="title">${tx.type === 'deposit' ? 'Deposit':'Withdrawal'}</div>
+          <div class="date">${formatDate(tx.createdAt)}</div>
+
+          <div class="txid">
+            ${id}
+            <span class="copy-btn" onclick="copyId('${id}')">Copy</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="amount">${formatMoney(tx.amount)}</div>
+        <div class="status">Completed</div>
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+/* REALTIME */
+onAuthStateChanged(auth, user => {
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+
+  let all = [];
+
+  onValue(ref(db,"deposits"), snap => {
+    all = all.filter(t=>t.source!=="deposit");
+
+    snap.forEach(c=>{
+      let d=c.val();
+      if(d.userId===user.uid && d.status==="success"){
+        all.push({...d,type:"deposit",source:"deposit",id:c.key});
+      }
+    });
+
+    render(all);
+  });
+
+  onValue(ref(db,"withdrawals"), snap => {
+    all = all.filter(t=>t.source!=="withdraw");
+
+    snap.forEach(c=>{
+      let d=c.val();
+      if(d.userId===user.uid && d.status==="success"){
+        all.push({...d,type:"withdraw",source:"withdraw",id:c.key});
+      }
+    });
+
+    render(all);
+  });
+
+});
+</script>
+
+</body>
+  </html>
