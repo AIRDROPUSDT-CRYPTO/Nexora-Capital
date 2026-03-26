@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Investments | Quantum Apex Ug</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:linear-gradient(135deg,#020617,#020617,#0f172a);
+  color:#fff;
+}
+
+/* TOPBAR */
+.topbar{
+  padding:15px;
+  text-align:center;
+  font-weight:600;
+  background:rgba(15,23,42,0.7);
+  backdrop-filter:blur(10px);
+}
+
+/* CONTAINER */
+.container{
+  padding:20px;
+}
+
+/* CARD */
+.card{
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  padding:18px;
+  border-radius:18px;
+  margin-bottom:15px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.5);
+  animation:fadeIn 0.4s ease;
+}
+
+/* ANIMATION */
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.plan{
+  font-size:15px;
+  font-weight:600;
+  color:#38bdf8;
+}
+
+/* STATUS */
+.status{
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:12px;
+}
+
+.active{
+  background:rgba(34,197,94,0.15);
+  color:#22c55e;
+}
+
+.completed{
+  background:rgba(148,163,184,0.15);
+  color:#94a3b8;
+}
+
+/* DETAILS */
+.details{
+  margin-top:10px;
+  font-size:13px;
+  color:#94a3b8;
+}
+
+/* COUNTDOWN */
+.countdown{
+  margin-top:12px;
+  font-size:14px;
+  font-weight:600;
+  color:#22c55e;
+}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  margin-top:60px;
+  color:#64748b;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">My Investments</div>
+
+<div class="container" id="investmentContainer">
+  <div class="empty">No active investments</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
+  authDomain: "betpawa-6ef7e.firebaseapp.com",
+  databaseURL: "https://betpawa-6ef7e-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "betpawa-6ef7e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+const container = document.getElementById("investmentContainer");
+
+/* PLAN DURATIONS */
+const durations = {
+  "24hrs": 1,
+  "3": 3,
+  "7": 7,
+  "12": 12,
+  "21": 21,
+  "36": 36
+};
+
+/* FORMAT MONEY */
+function formatMoney(amount){
+  return Number(amount).toLocaleString() + " UGX";
+}
+
+/* COUNTDOWN FUNCTION */
+function getRemaining(endTime){
+  let now = Date.now();
+  let diff = endTime - now;
+
+  if(diff <= 0) return "Completed";
+
+  let days = Math.floor(diff / (1000*60*60*24));
+  let hours = Math.floor((diff / (1000*60*60)) % 24);
+  let minutes = Math.floor((diff / (1000*60)) % 60);
+
+  return `${days}d ${hours}h ${minutes}m`;
+}
+
+/* RENDER */
+function render(data){
+  container.innerHTML = "";
+
+  if(data.length === 0){
+    container.innerHTML = '<div class="empty">No active investments</div>';
+    return;
+  }
+
+  data.sort((a,b)=>b.createdAt - a.createdAt);
+
+  data.forEach(inv => {
+
+    let days = durations[inv.plan] || 0;
+    let endTime = inv.createdAt + (days * 24 * 60 * 60 * 1000);
+
+    let isComplete = Date.now() >= endTime;
+
+    let div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div class="header">
+        <div class="plan">${inv.plan} Days Plan</div>
+        <div class="status ${isComplete ? 'completed' : 'active'}">
+          ${isComplete ? 'Completed' : 'Active'}
+        </div>
+      </div>
+
+      <div class="details">
+        Amount: ${formatMoney(inv.amount)}
+      </div>
+
+      <div class="countdown" id="cd-${inv.id}">
+        ${isComplete ? "Completed" : getRemaining(endTime)}
+      </div>
+    `;
+
+    container.appendChild(div);
+
+    /* LIVE COUNTDOWN */
+    if(!isComplete){
+      setInterval(()=>{
+        document.getElementById("cd-"+inv.id).innerText = getRemaining(endTime);
+      },60000);
+    }
+
+  });
+}
+
+/* REALTIME */
+onAuthStateChanged(auth, user => {
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+
+  onValue(ref(db,"investments"), snap => {
+
+    let list = [];
+
+    snap.forEach(child => {
+      let d = child.val();
+
+      if(d.userId === user.uid){
+        list.push({
+          id: child.key,
+          plan: d.plan,
+          amount: d.amount,
+          createdAt: d.createdAt
+        });
+      }
+    });
+
+    render(list);
+
+  });
+
+});
+</script>
+
+</body>
+</html>
