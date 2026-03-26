@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About | Quantum Apex Ug</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body{
+  background: radial-gradient(circle at top,#0f172a,#020617 60%);
+  color:#fff;
+}
+
+.topbar{
+  padding:15px;
+  text-align:center;
+  font-weight:600;
+  background:rgba(15,23,42,0.6);
+  backdrop-filter:blur(12px);
+}
+
+.container{padding:20px;}
+
+.card{
+  background:linear-gradient(145deg,#0f172a,#1e293b);
+  padding:20px;
+  border-radius:18px;
+  margin-bottom:18px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+.title{
+  color:#38bdf8;
+  margin-bottom:10px;
+  font-weight:600;
+}
+
+.text{
+  font-size:14px;
+  line-height:1.7;
+  color:#cbd5f5;
+}
+
+.counter-box{text-align:center;margin-bottom:12px;}
+.counter{font-size:26px;color:#22c55e;font-weight:600;}
+
+.step{margin-top:10px;font-size:14px;color:#e2e8f0;}
+
+.testimonial{
+  background:#020617;
+  padding:14px;
+  border-radius:12px;
+  margin-top:12px;
+  border:1px solid rgba(148,163,184,0.2);
+}
+
+.user{
+  font-weight:600;
+  color:#22c55e;
+  font-size:13px;
+}
+
+.badge{
+  font-size:11px;
+  background:rgba(34,197,94,0.15);
+  color:#22c55e;
+  padding:2px 6px;
+  border-radius:8px;
+  margin-left:5px;
+}
+
+.review{
+  font-size:13px;
+  color:#cbd5f5;
+  margin-top:5px;
+  line-height:1.5;
+}
+
+/* 🔥 LIKE BUTTON */
+.like-btn{
+  margin-top:8px;
+  font-size:12px;
+  color:#94a3b8;
+  cursor:pointer;
+}
+
+.like-btn:hover{
+  color:#38bdf8;
+}
+
+.faq-item{
+  border-bottom:1px solid rgba(148,163,184,0.2);
+  padding:12px 0;
+}
+
+.faq-q{
+  cursor:pointer;
+  font-size:14px;
+  color:#e2e8f0;
+  position:relative;
+}
+
+.faq-q::after{
+  content:"+";
+  position:absolute;
+  right:0;
+  color:#38bdf8;
+}
+
+.faq-a{
+  display:none;
+  font-size:13px;
+  color:#94a3b8;
+  margin-top:6px;
+  line-height:1.6;
+}
+
+.faq-item.active .faq-a{display:block;}
+.faq-item.active .faq-q::after{content:"-";}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">About Quantum Apex Ug</div>
+
+<div class="container">
+
+<!-- COUNTERS -->
+<div class="card">
+  <div class="title">Platform Statistics</div>
+
+  <div class="counter-box">
+    <div id="users" class="counter">0</div>
+    <div class="text">Active Users</div>
+  </div>
+
+  <div class="counter-box">
+    <div id="payouts" class="counter">0</div>
+    <div class="text">Total Paid (UGX)</div>
+  </div>
+
+  <div class="counter-box">
+    <div id="investments" class="counter">0</div>
+    <div class="text">Investments Made</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="card">
+  <div class="title">About Quantum Apex Ug</div>
+  <div class="text">
+    Quantum Apex Ug is a modern digital investment platform built to provide users with a structured and automated way to grow their funds through fixed-duration investment plans.
+    <br><br>
+    Since its launch, the platform has consistently delivered a reliable experience to its growing community of investors by combining <b>real-time financial tracking, automated profit systems, and secure database architecture</b>.
+    <br><br>
+    Unlike traditional investment systems, Quantum Apex Ug operates on a transparent model where users can monitor every aspect of their account — from deposits to profits and withdrawals — all updated instantly.
+    <br><br>
+    Our goal is simple: to provide a <b>stable, accessible, and user-friendly investment environment</b> for both beginners and experienced investors.
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="card">
+  <div class="title">User Experiences</div>
+
+  <div class="testimonial">
+    <div class="user">👤 Nicole <span class="badge">✔ Verified</span></div>
+    <div class="review">
+      This platform worked perfectly for me. I started small but now I’ve built steady profits. Everything updates in real-time and it feels very reliable.
+    </div>
+    <div class="like-btn" onclick="like(0)">👍 <span id="like0">0</span></div>
+  </div>
+
+  <div class="testimonial">
+    <div class="user">👤 James K. <span class="badge">💼 Investor</span></div>
+    <div class="review">
+      Deposits were smooth and withdrawals came through without issues. The system is simple but powerful.
+    </div>
+    <div class="like-btn" onclick="like(1)">👍 <span id="like1">0</span></div>
+  </div>
+
+  <div class="testimonial">
+    <div class="user">👤 Brian <span class="badge">⭐ Premium</span></div>
+    <div class="review">
+      I’ve used several platforms before but this one feels more transparent. I can track everything clearly.
+    </div>
+    <div class="like-btn" onclick="like(2)">👍 <span id="like2">0</span></div>
+  </div>
+
+  <div class="testimonial">
+    <div class="user">👤 Sandra M. <span class="badge">✔ Verified</span></div>
+    <div class="review">
+      The referral bonus actually works. I invited a friend and got my bonus instantly after their deposit.
+    </div>
+    <div class="like-btn" onclick="like(3)">👍 <span id="like3">0</span></div>
+  </div>
+
+  <div class="testimonial">
+    <div class="user">👤 Kelvin <span class="badge">💰 Top Earner</span></div>
+    <div class="review">
+      The dashboard design is clean and professional. It’s easy to understand even for beginners.
+    </div>
+    <div class="like-btn" onclick="like(4)">👍 <span id="like4">0</span></div>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+
+/* LIKE SYSTEM ONLY */
+let likes = JSON.parse(localStorage.getItem("testimonialLikes")) || [0,0,0,0,0];
+
+function like(i){
+  likes[i]++;
+  localStorage.setItem("testimonialLikes", JSON.stringify(likes));
+  document.getElementById("like"+i).innerText = likes[i];
+}
+
+/* LOAD SAVED LIKES */
+likes.forEach((val,i)=>{
+  document.getElementById("like"+i).innerText = val;
+});
+
+</script>
+<!-- FAQ -->
+<div class="card">
+  <div class="title">Frequently Asked Questions</div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFAQ(this)">How do I start investing?</div>
+    <div class="faq-a">
+      Simply create an account, deposit funds, choose a plan, and invest. The system handles profit calculations automatically.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFAQ(this)">When can I withdraw?</div>
+    <div class="faq-a">
+      You can withdraw once your funds are available in your withdrawable balance. Minimum withdrawal is 2,000 UGX.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFAQ(this)">What is locked balance?</div>
+    <div class="faq-a">
+      Locked balance represents funds currently invested in active plans. It becomes available after the plan matures.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFAQ(this)">Is the referral bonus unlimited?</div>
+    <div class="faq-a">
+      Yes, you can refer unlimited users, but each referral gives only one bonus (10% of their first deposit).
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+function animate(id,target){
+  let el=document.getElementById(id);
+  let count=0,step=target/100;
+  let i=setInterval(()=>{
+    count+=step;
+    if(count>=target){count=target;clearInterval(i);}
+    el.innerText=Math.floor(count).toLocaleString();
+  },20);
+}
+
+animate("users",3842);
+animate("payouts",12450000);
+animate("investments",1276);
+
+function toggleFAQ(el){
+  el.parentElement.classList.toggle("active");
+}
+</script>
+
+</body>
+</html>
