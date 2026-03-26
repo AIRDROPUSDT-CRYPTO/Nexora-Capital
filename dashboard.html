@@ -1,144 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard | Quantum Apex Ug</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Poppins',sans-serif;
-}
-
-body{
-  background: linear-gradient(135deg,#020617,#0f172a,#1e293b);
-  color:#fff;
-}
-
-/* TOP BAR */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px;
-  background:#0f172a;
-}
-
-/* OVERLAY */
-.overlay{
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  z-index:998;
-}
-
-.overlay.show{
-  display:block;
-}
-
-/* SIDEBAR */
-.sidebar{
-  position:fixed;
-  top:0;
-  left:-260px;
-  width:260px;
-  height:100%;
-  background:linear-gradient(180deg,#020617,#0f172a);
-  padding:25px 20px;
-  transition:0.3s;
-  z-index:999;
-}
-
-.sidebar.show{
-  left:0;
-}
-
-.sidebar h3{
-  color:#38bdf8;
-  margin-bottom:20px;
-}
-
-.sidebar a{
-  display:block;
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:8px;
-  color:#cbd5f5;
-  text-decoration:none;
-}
-
-.sidebar a:hover{
-  background:#1e293b;
-  color:#38bdf8;
-}
-
-/* PROFILE PANEL */
-.profile-panel{
-  position:fixed;
-  top:0;
-  right:-320px;
-  width:320px;
-  height:100%;
-  background:linear-gradient(180deg,#0f172a,#1e293b);
-  padding:25px;
-  transition:0.3s;
-  z-index:999;
-  box-shadow:-5px 0 20px rgba(0,0,0,0.5);
-}
-
-.profile-panel.show{
-  right:0;
-}
-
-.profile-panel h3{
-  margin-bottom:15px;
-  color:#38bdf8;
-}
-
-.profile-panel input{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border-radius:8px;
-  border:none;
-  outline:none;
-  background:#ffffff;
-  color:#000;
-  font-weight:500;
-}
-
-/* BUTTONS */
-.save-btn{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:25px;
-  background:linear-gradient(45deg,#38bdf8,#6366f1);
-  color:#fff;
-  cursor:pointer;
-  font-weight:600;
-}
-
-.logout-btn{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:25px;
-  background:#ef4444;
-  color:#fff;
-  cursor:pointer;
-  font-weight:600;
-}
-
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Dashboard | Quantum Apex Ug</title>  
+  
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">  
+  
+<style>  
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}  
+  
+body{  
+  background: linear-gradient(135deg,#020617,#0f172a,#1e293b);  
+  color:#fff;  
+}  
+  
+.topbar{  
+  display:flex;  
+  justify-content:space-between;  
+  align-items:center;  
+  padding:15px;  
+  background:#0f172a;  
+}  
+  
+.overlay{position:fixed;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;z-index:998;}  
+.overlay.show{display:block;}  
+  
+.sidebar{position:fixed;top:0;left:-260px;width:260px;height:100%;background:linear-gradient(180deg,#020617,#0f172a);padding:25px 20px;transition:0.3s;z-index:999;}  
+.sidebar.show{left:0;}  
+  
+.sidebar h3{color:#38bdf8;margin-bottom:20px;}  
+  
+.sidebar a{display:block;padding:12px;margin-bottom:10px;border-radius:8px;color:#cbd5f5;text-decoration:none;}  
+.sidebar a:hover{background:#1e293b;color:#38bdf8;}  
+  
+.profile-panel{position:fixed;top:0;right:-320px;width:320px;height:100%;background:linear-gradient(180deg,#0f172a,#1e293b);padding:25px;transition:0.3s;z-index:999;box-shadow:-5px 0 20px rgba(0,0,0,0.5);}  
+.profile-panel.show{right:0;}  
+  
+.profile-panel h3{margin-bottom:15px;color:#38bdf8;}  
+  
+.profile-panel input{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:none;outline:none;background:#ffffff;color:#000;font-weight:500;}  
+  
+.save-btn,.logout-btn{width:100%;padding:12px;margin-top:10px;border:none;border-radius:25px;color:#fff;cursor:pointer;font-weight:600;}  
+.save-btn{background:linear-gradient(45deg,#38bdf8,#6366f1);}  
+.logout-btn{background:#ef4444;}  
+  
 /* BALANCES */
 .balances{
   padding:20px;
@@ -147,251 +53,303 @@ body{
 .balance-top{
   display:flex;
   justify-content:space-between;
-  gap:10px;
+  gap:12px;
 }
 
+/* 🔥 MAIN CARDS */
 .balance-card{
   flex:1;
-  background:linear-gradient(135deg,#1e293b,#0f172a);
-  padding:15px;
-  border-radius:12px;
+  background: linear-gradient(145deg, #020617, #0f172a);
+  border:1px solid rgba(56,189,248,0.15);
+  padding:16px;
+  border-radius:14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transition:0.3s;
+}
+
+.balance-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 6px 25px rgba(0,0,0,0.6);
 }
 
 .balance-card h4{
-  font-size:13px;
+  font-size:12px;
   color:#94a3b8;
+  letter-spacing:0.5px;
 }
 
 .balance-card p{
-  margin-top:5px;
-  font-size:18px;
-  color:#38bdf8;
+  margin-top:6px;
+  font-size:20px;
+  font-weight:600;
+  color:#22c55e; /* 💸 money green */
 }
 
+/* 💎 WITHDRAW BOX */
 .withdraw-box{
-  margin-top:12px;
-  background:linear-gradient(135deg,#0ea5e9,#6366f1);
-  padding:15px;
-  border-radius:12px;
+  margin-top:14px;
+  background: linear-gradient(135deg, #020617, #1e293b);
+  border:1px solid rgba(34,197,94,0.25);
+  padding:18px;
+  border-radius:14px;
   text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+}
+
+.withdraw-box h4{
+  color:#94a3b8;
+  font-size:13px;
 }
 
 .withdraw-box p{
-  font-size:20px;
-  margin-top:5px;
+  font-size:22px;
+  font-weight:700;
+  margin-top:6px;
+  color:#22c55e;
+  text-shadow:0 0 8px rgba(34,197,94,0.5);
 }
-
-/* PLANS */
-.plans{
-  padding:20px;
-}
-
-.plan{
-  background:linear-gradient(135deg,#1e293b,#020617);
-  padding:18px;
-  border-radius:14px;
-  margin-bottom:15px;
-}
-
-.plan h3{
-  color:#38bdf8;
-}
-
-.plan p{
-  font-size:13px;
-  color:#94a3b8;
-  margin:4px 0;
-}
-
-.plan button{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:25px;
-  margin-top:10px;
-  background:linear-gradient(45deg,#38bdf8,#6366f1);
-  color:#fff;
-  cursor:pointer;
-}
-</style>
-</head>
-
-<body>
-
-<div class="topbar">
-  <span onclick="toggleMenu()">☰</span>
-  <h3>Dashboard</h3>
-  <span onclick="toggleProfile()">👤</span>
-</div>
-
-<div id="overlay" class="overlay" onclick="closeAll()"></div>
-
-<!-- SIDEBAR -->
-<div id="sidebar" class="sidebar">
-  <h3>Menu</h3>
-  <a href="dashboard.html">Dashboard</a>
-  <a href="deposit.html">Deposit</a>
-  <a href="withdraw.html">Withdraw</a>
-  <a href="transactions.html">Transaction History</a>
-  <a href="investments.html">My Investments</a>
-  <a href="referral.html">Refer and Earn</a>
-  <a href="chat.html">Join Chat Room</a>
-  <a href="about.html">About Quantum Apex</a>
-</div>
-
-<!-- PROFILE -->
-<div id="profilePanel" class="profile-panel">
-  <h3>Edit Profile</h3>
-
-  <input type="text" id="editName" placeholder="Full Name">
-  <input type="text" id="editPhone" placeholder="Phone Number">
-  <input type="email" id="editEmail" disabled>
-
-  <button class="save-btn" onclick="saveProfile()">Save Changes</button>
-  <button class="logout-btn" onclick="logout()">Logout</button>
-</div>
-
-<!-- BALANCES -->
-<div class="balances">
-  <div class="balance-top">
-    <div class="balance-card">
-      <h4>Main Balance</h4>
-      <p id="mainBalance">0 UGX</p>
-    </div>
-
-    <div class="balance-card">
-      <h4>Locked Balance</h4>
-      <p id="lockedBalance">0 UGX</p>
-    </div>
-  </div>
-
-  <div class="withdraw-box">
-    <h4>Withdrawable Balance</h4>
-    <p id="withdrawable">0 UGX</p>
-  </div>
-</div>
-
-<!-- ✅ FIXED PLANS -->
-<div class="plans">
-
-  <div class="plan">
-    <h3>36 Days Plan</h3>
-    <p>Duration: 36 Days</p>
-    <p>Daily Profit: ~3.33%</p>
-    <p>Minimum: 5,000 UGX</p>
-    <button onclick="goPlan('36.html')">Invest Now</button>
-  </div>
-
-  <div class="plan">
-    <h3>21 Days Plan</h3>
-    <p>Duration: 21 Days</p>
-    <p>Daily Profit: 5%</p>
-    <p>Minimum: 10,000 UGX</p>
-    <button onclick="goPlan('21.html')">Invest Now</button>
-  </div>
-
-  <div class="plan">
-    <h3>12 Days Plan</h3>
-    <p>Duration: 12 Days</p>
-    <p>Daily Profit: 7%</p>
-    <p>Minimum: 150,000 UGX</p>
-    <button onclick="goPlan('12.html')">Invest Now</button>
-  </div>
-
-  <div class="plan">
-    <h3>7 Days Plan</h3>
-    <p>Duration: 7 Days</p>
-    <p>Daily Profit: 9%</p>
-    <p>Minimum: 500,000 UGX</p>
-    <button onclick="goPlan('7.html')">Invest Now</button>
-  </div>
-
-  <div class="plan">
-    <h3>3 Days Plan</h3>
-    <p>Duration: 3 Days</p>
-    <p>Daily Profit: 12%</p>
-    <p>Minimum: 1,000,000 UGX</p>
-    <button onclick="goPlan('3.html')">Invest Now</button>
-  </div>
   
-  <div class="plan">
-    <h3>24 hrs Plan</h3>
-    <p>Duration: 24 hrs</p>
-    <p>Daily Profit: 40%</p>
-    <p>Minimum: 300,000 UGX</p>
-    <button onclick="goPlan('24hrs.html')">Invest Now</button>
-  </div>
-
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
-  authDomain: "betpawa-6ef7e.firebaseapp.com",
-  databaseURL: "https://betpawa-6ef7e-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "betpawa-6ef7e"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
-
-let currentUserId = null;
-
-window.toggleMenu = ()=>{sidebar.classList.add("show");overlay.classList.add("show");}
-window.toggleProfile = ()=>{profilePanel.classList.add("show");overlay.classList.add("show");}
-window.closeAll = ()=>{sidebar.classList.remove("show");profilePanel.classList.remove("show");overlay.classList.remove("show");}
-
-window.goPlan = (p)=>{window.location.href=p}
-
-onAuthStateChanged(auth,(user)=>{
-  if(user){
-    currentUserId = user.uid;
-
-    const userRef = ref(db,"users/"+user.uid);
-
-    onValue(userRef,(snap)=>{
-      const d = snap.val();
-      if(!d) return;
-
-      editName.value = d.name;
-      editPhone.value = d.phone;
-      editEmail.value = d.email;
-
-      let main = d.balance || 0;
-      let locked = d.lockedBalance || 0;
-      if(locked < 0) locked = 0;
-
-      let withdrawableAmt = main - locked;
-      if(withdrawableAmt < 0) withdrawableAmt = 0;
-
-      mainBalance.innerText = main + " UGX";
-      lockedBalance.innerText = locked + " UGX";
-      withdrawable.innerText = withdrawableAmt + " UGX";
-    });
-
-  }else{
-    window.location.href="login.html";
-  }
-});
-
-window.saveProfile = ()=>{
-  update(ref(db,"users/"+currentUserId),{
-    name: editName.value,
-    phone: editPhone.value
-  });
+/* ✅ PAYOUT FEED (NEW ONLY) */
+.payout-feed{
+  background: linear-gradient(90deg,#020617,#0f172a);
+  padding:10px;
+  text-align:center;
+  font-size:13px;
+  border-bottom:1px solid #1e293b;
+  height:40px;
+  overflow:hidden;
+  position:relative;
+  color:#cbd5f5; /* soft text */
 }
 
-window.logout = ()=>{
-  signOut(auth).then(()=>{
-    window.location.href="login.html";
-  });
+.payout-item{
+  position:absolute;
+  width:100%;
+  animation:slide 4s ease-in-out;
+  color:#cbd5f5;
 }
-</script>
 
-</body>
-</html>
+/* 🔥 highlight winnings */
+.payout-item b{
+  color:#22c55e; /* green = money */
+  font-weight:600;
+}
+
+@keyframes slide{
+  0%{transform:translateY(100%);opacity:0;}
+  20%{opacity:1;}
+  80%{opacity:1;}
+  100%{transform:translateY(-100%);opacity:0;}
+}
+
+.plans{padding:20px;}  
+  
+.plan{background:linear-gradient(135deg,#1e293b,#020617);padding:18px;border-radius:14px;margin-bottom:15px;}  
+.plan h3{color:#38bdf8;}  
+.plan p{font-size:13px;color:#94a3b8;margin:4px 0;}  
+.plan button{width:100%;padding:10px;border:none;border-radius:25px;margin-top:10px;background:linear-gradient(45deg,#38bdf8,#6366f1);color:#fff;cursor:pointer;}  
+</style>  
+</head>  
+  
+<body>  
+  
+<div class="topbar">  
+  <span onclick="toggleMenu()">☰</span>  
+  <h3>Dashboard</h3>  
+  <span onclick="toggleProfile()">👤</span>  
+</div>  
+
+<!-- ✅ LIVE PAYOUT FEED -->
+<div id="payoutFeed" class="payout-feed"></div>
+  
+<div id="overlay" class="overlay" onclick="closeAll()"></div>  
+  
+<div id="sidebar" class="sidebar">  
+  <h3>Menu</h3>  
+  <a href="dashboard.html">Dashboard</a>  
+  <a href="deposit.html">Deposit</a>  
+  <a href="withdraw.html">Withdraw</a>  
+  <a href="transactions.html">Transaction History</a>  
+  <a href="investments.html">My Investments</a>  
+  <a href="referral.html">Refer and Earn</a>  
+  <a href="chat.html">Join Chat Room</a>  
+  <a href="about.html">About Quantum Apex</a>  
+</div>  
+  
+<div id="profilePanel" class="profile-panel">  
+  <h3>Edit Profile</h3>  
+  <input type="text" id="editName" placeholder="Full Name">  
+  <input type="text" id="editPhone" placeholder="Phone Number">  
+  <input type="email" id="editEmail" disabled>  
+  <button class="save-btn" onclick="saveProfile()">Save Changes</button>  
+  <button class="logout-btn" onclick="logout()">Logout</button>  
+</div>  
+  
+<div class="balances">  
+  <div class="balance-top">  
+    <div class="balance-card">  
+      <h4>Main Balance</h4>  
+      <p id="mainBalance">0 UGX</p>  
+    </div>  
+    <div class="balance-card">  
+      <h4>Locked Balance</h4>  
+      <p id="lockedBalance">0 UGX</p>  
+    </div>  
+  </div>  
+  
+  <div class="withdraw-box">  
+    <h4>Withdrawable Balance</h4>  
+    <p id="withdrawable">0 UGX</p>  
+  </div>  
+</div>  
+  
+<div class="plans">  
+  <!-- (UNCHANGED PLANS) -->
+  <div class="plan"><h3>36 Days Plan</h3><p>Duration: 36 Days</p><p>Daily Profit: ~3.33%</p><p>Minimum: 5,000 UGX</p><button onclick="goPlan('36.html')">Invest Now</button></div>  
+  <div class="plan"><h3>21 Days Plan</h3><p>Duration: 21 Days</p><p>Daily Profit: 5%</p><p>Minimum: 10,000 UGX</p><button onclick="goPlan('21.html')">Invest Now</button></div>  
+  <div class="plan"><h3>12 Days Plan</h3><p>Duration: 12 Days</p><p>Daily Profit: 7%</p><p>Minimum: 150,000 UGX</p><button onclick="goPlan('12.html')">Invest Now</button></div>  
+  <div class="plan"><h3>7 Days Plan</h3><p>Duration: 7 Days</p><p>Daily Profit: 9%</p><p>Minimum: 500,000 UGX</p><button onclick="goPlan('7.html')">Invest Now</button></div>  
+  <div class="plan"><h3>3 Days Plan</h3><p>Duration: 3 Days</p><p>Daily Profit: 12%</p><p>Minimum: 1,000,000 UGX</p><button onclick="goPlan('3.html')">Invest Now</button></div>  
+  <div class="plan"><h3>24 hrs Plan</h3><p>Duration: 24 hrs</p><p>Daily Profit: 40%</p><p>Minimum: 300,000 UGX</p><button onclick="goPlan('24hrs.html')">Invest Now</button></div>  
+</div>  
+  
+<script type="module">  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";  
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";  
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";  
+  
+const firebaseConfig = {  
+  apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",  
+  authDomain: "betpawa-6ef7e.firebaseapp.com",  
+  databaseURL: "https://betpawa-6ef7e-default-rtdb.europe-west1.firebasedatabase.app",  
+  projectId: "betpawa-6ef7e"  
+};  
+  
+const app = initializeApp(firebaseConfig);  
+const db = getDatabase(app);  
+const auth = getAuth(app);  
+  
+let currentUserId = null;  
+  
+window.toggleMenu = ()=>{sidebar.classList.add("show");overlay.classList.add("show");}  
+window.toggleProfile = ()=>{profilePanel.classList.add("show");overlay.classList.add("show");}  
+window.closeAll = ()=>{sidebar.classList.remove("show");profilePanel.classList.remove("show");overlay.classList.remove("show");}  
+window.goPlan = (p)=>{window.location.href=p}  
+  
+/* ✅ LIVE PAYOUT LOGIC (10+ FEEDS) */
+const payouts = [
+"James 🇺🇬 just withdrew <b>45,000 UGX</b>",
+"Brian 🇺🇬 just withdrew <b>120,000 UGX</b>",
+"Sarah 🇺🇬 just withdrew <b>75,000 UGX</b>",
+"Daniel 🇺🇬 just withdrew <b>200,000 UGX</b>",
+"Kevin 🇺🇬 just withdrew <b>60,000 UGX</b>",
+"Alice 🇺🇬 just withdrew <b>90,000 UGX</b>",
+"Moses 🇺🇬 just withdrew <b>150,000 UGX</b>",
+"Esther 🇺🇬 just withdrew <b>80,000 UGX</b>",
+"Peter 🇺🇬 just withdrew <b>300,000 UGX</b>",
+"Grace 🇺🇬 just withdrew <b>110,000 UGX</b>",
+
+"John 🇺🇬 just withdrew <b>500,000 UGX</b>",
+"Michael 🇺🇬 just withdrew <b>1,000,000 UGX</b>",
+"Samuel 🇺🇬 just withdrew <b>2,000,000 UGX</b>",
+"Paul 🇺🇬 just withdrew <b>980,000 UGX</b>",
+"David 🇺🇬 just withdrew <b>625,000 UGX</b>",
+
+"Isaac 🇺🇬 just withdrew <b>210,000 UGX</b>",
+"Noah 🇺🇬 just withdrew <b>340,000 UGX</b>",
+"Emma 🇺🇬 just withdrew <b>130,000 UGX</b>",
+"Olivia 🇺🇬 just withdrew <b>275,000 UGX</b>",
+"Sophia 🇺🇬 just withdrew <b>410,000 UGX</b>",
+
+"Liam 🇺🇬 just withdrew <b>95,000 UGX</b>",
+"Lucas 🇺🇬 just withdrew <b>720,000 UGX</b>",
+"Mia 🇺🇬 just withdrew <b>180,000 UGX</b>",
+"Amelia 🇺🇬 just withdrew <b>360,000 UGX</b>",
+"Charlotte 🇺🇬 just withdrew <b>540,000 UGX</b>",
+
+"Ethan 🇺🇬 just withdrew <b>870,000 UGX</b>",
+"Ava 🇺🇬 just withdrew <b>250,000 UGX</b>",
+"Harper 🇺🇬 just withdrew <b>150,000 UGX</b>",
+"Evelyn 🇺🇬 just withdrew <b>430,000 UGX</b>",
+"Abigail 🇺🇬 just withdrew <b>390,000 UGX</b>",
+
+"Elijah 🇺🇬 just withdrew <b>1,200,000 UGX</b>",
+"Logan 🇺🇬 just withdrew <b>670,000 UGX</b>",
+"Alexander 🇺🇬 just withdrew <b>880,000 UGX</b>",
+"Benjamin 🇺🇬 just withdrew <b>540,000 UGX</b>",
+"Jacob 🇺🇬 just withdrew <b>320,000 UGX</b>",
+
+"Daniel 🇺🇬 just withdrew <b>760,000 UGX</b>",
+"Matthew 🇺🇬 just withdrew <b>1,500,000 UGX</b>",
+"Joseph 🇺🇬 just withdrew <b>2,000,000 UGX</b>",
+"Samuel 🇺🇬 just withdrew <b>910,000 UGX</b>",
+"David 🇺🇬 just withdrew <b>470,000 UGX</b>",
+
+"Victor 🇺🇬 just withdrew <b>285,000 UGX</b>",
+"Ronald 🇺🇬 just withdrew <b>355,000 UGX</b>",
+"Patrick 🇺🇬 just withdrew <b>620,000 UGX</b>",
+"George 🇺🇬 just withdrew <b>780,000 UGX</b>",
+"Henry 🇺🇬 just withdrew <b>890,000 UGX</b>",
+
+"Anthony 🇺🇬 just withdrew <b>1,800,000 UGX</b>",
+"Frank 🇺🇬 just withdrew <b>530,000 UGX</b>",
+"Chris 🇺🇬 just withdrew <b>270,000 UGX</b>",
+"Andrew 🇺🇬 just withdrew <b>640,000 UGX</b>",
+"Simon 🇺🇬 just withdrew <b>710,000 UGX</b>"
+];
+
+let index = 0;
+
+setInterval(()=>{
+  let div = document.createElement("div");
+  div.className = "payout-item";
+  div.innerHTML = payouts[index];
+
+  payoutFeed.innerHTML = "";
+  payoutFeed.appendChild(div);
+
+  index = (index + 1) % payouts.length;
+
+},4000);
+
+/* EXISTING LOGIC UNCHANGED */
+onAuthStateChanged(auth,(user)=>{  
+  if(user){  
+    currentUserId = user.uid;  
+    const userRef = ref(db,"users/"+user.uid);  
+    onValue(userRef,(snap)=>{  
+      const d = snap.val();  
+      if(!d) return;  
+      editName.value = d.name;  
+      editPhone.value = d.phone;  
+      editEmail.value = d.email;  
+      let main = d.balance || 0;  
+      let locked = d.lockedBalance || 0;  
+      if(locked < 0) locked = 0;  
+      let withdrawableAmt = main - locked;  
+      if(withdrawableAmt < 0) withdrawableAmt = 0;  
+      mainBalance.innerText = main + " UGX";  
+      lockedBalance.innerText = locked + " UGX";  
+      withdrawable.innerText = withdrawableAmt + " UGX";  
+    });  
+  }else{  
+    window.location.href="login.html";  
+  }  
+});  
+  
+window.saveProfile = ()=>{  
+  update(ref(db,"users/"+currentUserId),{  
+    name: editName.value,  
+    phone: editPhone.value  
+  });  
+}  
+  
+window.logout = ()=>{  
+  signOut(auth).then(()=>{  
+    window.location.href="login.html";  
+  });  
+}  
+</script>  
+  
+</body>  
+  </html>
