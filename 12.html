@@ -15,13 +15,15 @@ body{
   color:#fff;
 }
 
+/* MAIN */
 .container{padding:20px;}
 
 .plan{
   background:linear-gradient(135deg,#1e293b,#020617);
   padding:18px;
-  border-radius:14px;
+  border-radius:16px;
   margin-bottom:15px;
+  box-shadow:0 0 20px rgba(0,0,0,0.3);
 }
 
 .plan h3{color:#38bdf8;}
@@ -29,37 +31,75 @@ body{
 
 button{
   width:100%;
-  padding:10px;
+  padding:12px;
   border:none;
-  border-radius:25px;
+  border-radius:30px;
   margin-top:10px;
   background:linear-gradient(45deg,#38bdf8,#6366f1);
   color:#fff;
   cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
 }
+
+button:active{transform:scale(0.97);}
 
 .claim-btn{background:#22c55e;}
-.disabled{opacity:0.5;pointer-events:none;}
+.disabled{opacity:0.4;pointer-events:none;}
 
-.popup{
+/* 🔥 PREMIUM POPUP */
+.overlay{
   position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%) scale(0.9);
-  padding:20px;
-  border-radius:12px;
-  text-align:center;
-  width:280px;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(6px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
   opacity:0;
+  pointer-events:none;
   transition:0.3s;
   z-index:999;
-  color:#fff;
 }
 
-.popup.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
-.popup.success{ background:#065f46; }
-.popup.error{ background:#7f1d1d; }
-.popup.info{ background:#1e293b; }
+.overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.popup{
+  width:300px;
+  background:linear-gradient(135deg,#0f172a,#020617);
+  border-radius:18px;
+  padding:22px;
+  text-align:center;
+  box-shadow:0 0 30px rgba(56,189,248,0.2);
+  transform:scale(0.8);
+  transition:0.3s;
+}
+
+.overlay.show .popup{
+  transform:scale(1);
+}
+
+.popup h3{
+  margin-bottom:8px;
+  font-weight:600;
+}
+
+.popup p{
+  font-size:13px;
+  color:#94a3b8;
+}
+
+.popup.success{border:1px solid #22c55e;}
+.popup.error{border:1px solid #ef4444;}
+.popup.info{border:1px solid #38bdf8;}
+
+.popup button{
+  margin-top:14px;
+  background:#22c55e;
+}
 </style>
 </head>
 
@@ -70,9 +110,13 @@ button{
 <div id="plans"></div>
 </div>
 
-<div id="popup" class="popup">
-  <h3 id="popTitle"></h3>
-  <p id="popMsg"></p>
+<!-- POPUP -->
+<div id="overlay" class="overlay">
+  <div id="popup" class="popup">
+    <h3 id="popTitle"></h3>
+    <p id="popMsg"></p>
+    <button id="popBtn" style="display:none;"></button>
+  </div>
 </div>
 
 <script type="module">
@@ -80,9 +124,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getDatabase, ref, onValue, update, push, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-/* ✅ FIX: DEFINE ELEMENT */
+/* ELEMENTS */
 const plansDiv = document.getElementById("plans");
+const overlay = document.getElementById("overlay");
+const popup = document.getElementById("popup");
+const popTitle = document.getElementById("popTitle");
+const popMsg = document.getElementById("popMsg");
+const popBtn = document.getElementById("popBtn");
 
+/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
   authDomain: "betpawa-6ef7e.firebaseapp.com",
@@ -91,112 +141,130 @@ const firebaseConfig = {
   storageBucket: "betpawa-6ef7e.firebasestorage.app",
   messagingSenderId: "908050081607",
   appId: "1:908050081607:web:db6e861fca63df78584e62",
-  measurementId: "G-C7M7HWTD01"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
+/* CONFIG */
 const plans = [150000,500000,1000000,5000000];
 const DAILY_PERCENT = 0.0917;
 const DAYS = 12;
 
 let uid=null;
-let notified = {};
 
-/* POPUP */
-function showPopup(t,m,type="info"){
-  popTitle.innerText=t;
-  popMsg.innerText=m;
-  popup.className="popup show "+type;
-  setTimeout(()=>popup.classList.remove("show"),2000);
+/* ✅ POPUP */
+function showPopup(title,msg,type="info",btnText=null,action=null){
+  popTitle.innerText = title;
+  popMsg.innerText = msg;
+
+  popup.className = "popup " + type;
+  overlay.classList.add("show");
+
+  if(btnText){
+    popBtn.style.display="block";
+    popBtn.innerText=btnText;
+    popBtn.onclick = action;
+  }else{
+    popBtn.style.display="none";
+    setTimeout(()=>overlay.classList.remove("show"),2000);
+  }
 }
 
-/* TIME FORMAT */
+/* CLOSE ON OUTSIDE CLICK */
+overlay.addEventListener("click",(e)=>{
+  if(e.target === overlay){
+    overlay.classList.remove("show");
+  }
+});
+
+/* TIME */
 function formatTime(ms){
-  if(ms <= 0) return "0h 0m 0s";
-  let total = Math.floor(ms/1000);
-  let h = Math.floor(total/3600);
-  let m = Math.floor((total%3600)/60);
-  let s = total%60;
+  if(ms <= 0) return "Ready";
+  let t = Math.floor(ms/1000);
+  let h = Math.floor(t/3600);
+  let m = Math.floor((t%3600)/60);
+  let s = t%60;
   return `${h}h ${m}m ${s}s`;
+}
+
+/* FIX BAD DATA */
+function sanitize(data){
+  let clean={};
+  Object.keys(data).forEach(k=>{
+    if(typeof data[k]==="object" && data[k]!==null){
+      clean[k]=data[k];
+      clean[k].id=k;
+    }
+  });
+  return clean;
 }
 
 /* RENDER */
 function renderPlans(investments={}){
-  let html="";
+  plansDiv.innerHTML="";
 
   plans.forEach(amount=>{
     let active = Object.values(investments).find(i=>i.amount===amount);
 
+    let div=document.createElement("div");
+    div.className="plan";
+
     if(active){
       let finished = active.completed === true;
+      let next = active.lastClaim + 86400000;
+      let remaining = next - Date.now();
+      let canClaim = remaining <= 0;
 
-      let now = Date.now();
-      let nextTime = active.lastClaim + 86400000;
-      let remainingTime = nextTime - now;
-      let canClaim = remainingTime <= 0;
-
-      let earned = Math.floor(active.daily * active.daysClaimed);
-
-      /* notify once */
-      if(canClaim && !finished && !notified[active.id]){
-        showPopup("Ready 🎉","You can now claim earnings","success");
-        notified[active.id] = true;
-      }
-
-      if(!canClaim){
-        notified[active.id] = false;
-      }
-
-      html+=`
-      <div class="plan">
+      div.innerHTML=`
         <h3>${amount.toLocaleString()} UGX</h3>
         <p>Daily: ${Math.floor(active.daily)} UGX</p>
         <p>Progress: ${active.daysClaimed}/${DAYS}</p>
-        <p>Total Earned: ${earned.toLocaleString()} UGX</p>
-        <p>${finished ? "Completed" : (canClaim ? "Ready to claim" : "Next in: "+formatTime(remainingTime))}</p>
+        <p>${finished ? "Completed" : formatTime(remaining)}</p>
+      `;
 
-        <button class="claim-btn ${(!canClaim || finished) ? "disabled" : ""}" 
-        onclick="claim('${active.id}')">
-        ${finished ? "Completed" : "Receive"}
-        </button>
-      </div>`;
+      let btn=document.createElement("button");
+      btn.className="claim-btn";
+      btn.innerText = finished ? "Completed" : "Receive";
+
+      if(!canClaim || finished) btn.classList.add("disabled");
+
+      btn.onclick = ()=>claim(active.id);
+
+      div.appendChild(btn);
+
     }else{
-      html+=`
-      <div class="plan">
+      div.innerHTML=`
         <h3>${amount.toLocaleString()} UGX</h3>
         <p>Duration: 12 Days</p>
         <p>Daily Profit: 9.17%</p>
-        <button onclick="invest(${amount})">Invest Now</button>
-      </div>`;
-    }
-  });
+      `;
 
-  plansDiv.innerHTML=html;
+      let btn=document.createElement("button");
+      btn.innerText="Invest Now";
+      btn.onclick = ()=>invest(amount);
+
+      div.appendChild(btn);
+    }
+
+    plansDiv.appendChild(div);
+  });
 }
 
-/* LIVE TIMER (NO RESET) */
-setInterval(async ()=>{
-  if(uid){
-    const snap = await get(ref(db,"investments/"+uid+"/12days"));
-    let data = snap.val() || {};
-
-    Object.keys(data).forEach(k=> data[k].id = k);
-
-    renderPlans(data);
-  }
-},1000);
-
 /* INVEST */
-window.invest = async(amount)=>{
+async function invest(amount){
   const userRef = ref(db,"users/"+uid);
-  const userSnap = await get(userRef);
-  const user = userSnap.val();
+  const user = (await get(userRef)).val();
 
   if((user.balance||0) < amount){
-    showPopup("Error","Insufficient balance","error");
+    showPopup(
+      "Insufficient Balance",
+      "Proceed to deposit?",
+      "error",
+      "Confirm",
+      ()=> window.location.href="deposit.html"
+    );
     return;
   }
 
@@ -206,38 +274,30 @@ window.invest = async(amount)=>{
   const newRef = push(ref(db,"investments/"+uid+"/12days"));
 
   await update(userRef,{
-    balance: user.balance - amount,
-    lockedBalance: (user.lockedBalance||0) + total
+    balance:user.balance-amount,
+    lockedBalance:(user.lockedBalance||0)+total
   });
 
   await update(newRef,{
-    id:newRef.key,
     amount,
     daily,
     total,
-    remaining: total,
+    remaining:total,
     lastClaim:0,
     daysClaimed:0,
     completed:false
   });
 
   showPopup("Success","Investment started","success");
-};
+}
 
 /* CLAIM */
-window.claim = async(id)=>{
+async function claim(id){
   const investRef = ref(db,"investments/"+uid+"/12days/"+id);
   const userRef = ref(db,"users/"+uid);
 
-  const snap = await get(investRef);
-  const data = snap.val();
-
+  const data = (await get(investRef)).val();
   if(!data) return;
-
-  if(data.completed){
-    showPopup("Done","Already completed");
-    return;
-  }
 
   if((Date.now()-data.lastClaim) < 86400000){
     showPopup("Wait","Come back after 24hrs");
@@ -245,19 +305,17 @@ window.claim = async(id)=>{
   }
 
   let daily = Math.floor(data.daily);
-
   let newDays = data.daysClaimed + 1;
-  let isDone = newDays >= DAYS;
+  let done = newDays >= DAYS;
 
   await update(investRef,{
     lastClaim:Date.now(),
     daysClaimed:newDays,
-    remaining:data.remaining - daily,
-    completed:isDone
+    remaining:data.remaining-daily,
+    completed:done
   });
 
-  const userSnap = await get(userRef);
-  const u = userSnap.val();
+  const u = (await get(userRef)).val();
 
   await update(userRef,{
     balance:(u.balance||0)+daily,
@@ -265,7 +323,7 @@ window.claim = async(id)=>{
   });
 
   showPopup("Success","Earnings received","success");
-};
+}
 
 /* REALTIME */
 onAuthStateChanged(auth,user=>{
@@ -275,9 +333,8 @@ onAuthStateChanged(auth,user=>{
     const investRef = ref(db,"investments/"+uid+"/12days");
 
     onValue(investRef,snap=>{
-      let data = snap.val() || {};
-      Object.keys(data).forEach(k=> data[k].id = k);
-      renderPlans(data);
+      let clean = sanitize(snap.val() || {});
+      renderPlans(clean);
     });
 
   }else{
@@ -287,4 +344,4 @@ onAuthStateChanged(auth,user=>{
 </script>
 
 </body>
-</html>
+      </html>
