@@ -4,7 +4,6 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 const db = admin.database();
 
-/* ✅ CORRECT PERCENTAGES */
 const PLANS = {
   150000: 0.15,
   500000: 0.25,
@@ -16,17 +15,17 @@ const DAYS = 12;
 const DAY_MS = 86400000;
 
 /* 🔒 INVEST */
-exports.investPlan = functions.https.onCall(async (data, context) => {
+exports.investPlan = functions.region("europe-west1").https.onCall(async (data, context) => {
 
   if (!context.auth) {
     throw new functions.https.HttpsError("unauthenticated", "Login required");
   }
 
   const uid = context.auth.uid;
-  const amount = Number(data.amount);
+  const amount = data.amount;
 
   if (!PLANS[amount]) {
-    throw new functions.https.HttpsError("invalid-argument", "Invalid plan selected");
+    throw new functions.https.HttpsError("invalid-argument", "Invalid plan");
   }
 
   const percent = PLANS[amount];
@@ -42,7 +41,7 @@ exports.investPlan = functions.https.onCall(async (data, context) => {
   if (!user || (user.balance || 0) < amount) {
     throw new functions.https.HttpsError(
       "failed-precondition",
-      "Insufficient balance to invest"
+      "Insufficient balance, please top up"
     );
   }
 
@@ -76,14 +75,14 @@ exports.investPlan = functions.https.onCall(async (data, context) => {
 
 
 /* 🔒 CLAIM */
-exports.claimEarnings = functions.https.onCall(async (data, context) => {
+exports.claimEarnings = functions.region("europe-west1").https.onCall(async (data, context) => {
 
   if (!context.auth) {
     throw new functions.https.HttpsError("unauthenticated", "Login required");
   }
 
   const uid = context.auth.uid;
-  const amount = Number(data.amount);
+  const amount = data.amount;
 
   const investRef = db.ref(`investments/${uid}/12days/${amount}`);
   const userRef = db.ref("users/" + uid);
@@ -107,13 +106,15 @@ exports.claimEarnings = functions.https.onCall(async (data, context) => {
 
   const payout = Math.floor(inv.daily);
 
+  /* ✅ UPDATE INVESTMENT */
   await investRef.update({
     lastClaim: Date.now(),
     daysClaimed: inv.daysClaimed + 1,
     remaining: inv.remaining - payout,
-    completed: inv.daysClaimed + 1 >= DAYS
+    completed: (inv.daysClaimed + 1) >= DAYS
   });
 
+  /* ✅ UPDATE USER */
   const userSnap = await userRef.get();
   const user = userSnap.val();
 
