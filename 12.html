@@ -63,6 +63,7 @@ button{
   top:20px;
   right:-400px;
   transition:0.4s;
+  font-size:14px;
 }
 
 .toast.show{right:20px;}
@@ -87,7 +88,7 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-functions.js";
 
-/* ✅ YOUR REAL CONFIG */
+/* ✅ CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
   authDomain: "betpawa-6ef7e.firebaseapp.com",
@@ -102,13 +103,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
-const functions = getFunctions(app);
+
+/* ⚠️ IMPORTANT: REGION FIX */
+const functions = getFunctions(app, "europe-west1");
 
 /* 🔒 BACKEND CALLS */
 const investPlan = httpsCallable(functions, "investPlan");
 const claimEarnings = httpsCallable(functions, "claimEarnings");
 
-/* ✅ REAL PERCENTAGES */
+/* 💰 PLANS */
 const plans = [
   {amount:150000, percent:15},
   {amount:500000, percent:25},
@@ -121,6 +124,7 @@ const DAYS=12;
 let investments={};
 const toast=document.getElementById("toast");
 
+/* 🔔 TOAST */
 function showToast(type,msg){
   toast.className="toast "+type;
   toast.innerText=msg;
@@ -128,12 +132,14 @@ function showToast(type,msg){
   setTimeout(()=>toast.classList.remove("show"),2500);
 }
 
+/* ⏱ TIMER */
 function format(ms){
   if(ms<=0) return "Ready to claim";
   let s=Math.floor(ms/1000);
   return `${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m ${s%60}s`;
 }
 
+/* 🎨 UI */
 function render(){
   const box=document.getElementById("plans");
   box.innerHTML="";
@@ -185,32 +191,51 @@ function render(){
   });
 }
 
+/* 🔒 FIXED INVEST */
 async function invest(amount){
   try{
     await investPlan({amount});
-    showToast("success","Investment started");
+    showToast("success","Investment started successfully");
   }catch(e){
-    showToast("warning",e.message);
+    console.error(e);
+
+    const msg =
+      e?.details ||
+      e?.message ||
+      "Investment failed, try again";
+
+    showToast("warning", msg);
   }
 }
 
+/* 🔒 FIXED CLAIM */
 async function claim(amount){
   try{
     await claimEarnings({amount});
     showToast("success","Earnings received");
   }catch(e){
-    showToast("info",e.message);
+    console.error(e);
+
+    const msg =
+      e?.details ||
+      e?.message ||
+      "Try again later";
+
+    showToast("info", msg);
   }
 }
 
+/* 🔄 REALTIME */
 onAuthStateChanged(auth,u=>{
   if(u){
     onValue(ref(db,"investments/"+u.uid+"/12days"),snap=>{
       let raw=snap.val()||{};
       investments={};
+
       Object.values(raw).forEach(v=>{
         investments[v.amount]=v;
       });
+
       render();
     });
   }else{
