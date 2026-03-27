@@ -10,27 +10,141 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
-html,body{height:100%;overflow:hidden;background:#020617;color:#fff;}
+
+html,body{
+  height:100%;
+  overflow:hidden;
+  background:#e5e7eb; /* ✅ LIGHT BACKGROUND */
+  color:#111;
+}
+
+/* ✅ BRIGHT CHAT AREA */
+.messages{
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  background:
+    linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
+    url('https://www.transparenttextures.com/patterns/diamond-upholstery.png');
+}
+
+/* KEEP STRUCTURE SAME */
 #chatApp{height:100%;display:flex;flex-direction:column;}
-.header{padding:12px;text-align:center;background:#0f172a;font-weight:600;}
-.status{font-size:11px;color:#22c55e;}
-.messages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;}
+
+.header{
+  padding:12px;
+  text-align:center;
+  background:#22c55e;
+  color:#000;
+  font-weight:600;
+}
+
+.status{font-size:11px;color:#065f46;}
+
 .msg{margin-bottom:12px;max-width:75%;}
-.name{font-size:11px;color:#38bdf8;}
+
+.name{font-size:11px;color:#0ea5e9;}
+
 .time{font-size:10px;opacity:0.6;margin-left:6px;}
-.bubble{padding:10px;border-radius:12px;margin-top:3px;position:relative;}
+
+.bubble{
+  padding:10px;
+  border-radius:12px;
+  margin-top:3px;
+  position:relative;
+}
+
+/* MY MESSAGE */
 .me{align-self:flex-end;}
-.me .bubble{background:#22c55e;color:#000;}
-.other .bubble{background:#1e293b;}
+.me .bubble{
+  background:#22c55e;
+  color:#000;
+}
+
+/* OTHER MESSAGE */
+.other .bubble{
+  background:#ffffff;
+  color:#111;
+  border:1px solid #ddd;
+}
+
 .tick{font-size:11px;margin-left:6px;}
-.chat-img{max-width:150px;border-radius:10px;margin-top:5px;}
-.typing{font-size:12px;color:#94a3b8;padding:5px 10px;}
-.input-box{display:flex;padding:8px;background:#0f172a;gap:6px;}
-#msgInput{flex:1;padding:8px;border:none;border-radius:20px;outline:none;}
-.icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:#1e293b;border:none;border-radius:50%;color:#fff;}
-.send-btn{background:#22c55e;color:#000;}
+
+.chat-img{
+  max-width:150px;
+  border-radius:10px;
+  margin-top:5px;
+}
+
+.typing{
+  font-size:12px;
+  color:#555;
+  padding:5px 10px;
+}
+
+/* INPUT */
+.input-box{
+  display:flex;
+  padding:8px;
+  background:#f1f5f9;
+  gap:6px;
+}
+
+#msgInput{
+  flex:1;
+  padding:8px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+}
+
+.icon-btn{
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  background:#e2e8f0;
+  border:none;border-radius:50%;
+  color:#000;
+}
+
+.send-btn{
+  background:#22c55e;
+  color:#000;
+}
+
 #fileInput{display:none;}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;padding:10px 16px;border-radius:10px;display:none;}
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111;
+  color:#fff;
+  padding:10px 16px;
+  border-radius:10px;
+  display:none;
+}
+
+/* ✅ BETTER REPLY VISIBILITY */
+.reply-box{
+  background:#dcfce7;
+  padding:6px;
+  font-size:12px;
+  margin-bottom:5px;
+  border-left:4px solid #22c55e;
+  color:#065f46;
+  border-radius:6px;
+}
+
+/* REACTION */
+.reaction{
+  position:absolute;
+  bottom:-10px;
+  right:5px;
+  font-size:14px;
+}
 </style>
 </head>
 
@@ -68,7 +182,7 @@ html,body{height:100%;overflow:hidden;background:#020617;color:#fff;}
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
+  apiKey: "AIzaSy...",
   authDomain: "betpawa-6ef7e.firebaseapp.com",
   databaseURL: "https://betpawa-6ef7e-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "betpawa-6ef7e",
@@ -78,22 +192,40 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const db = firebase.database();
 
-/* ✅ WAIT FOR AUTH */
+/* AUTH */
 firebase.auth().onAuthStateChanged(user=>{
   if(!user){
     firebase.auth().signInAnonymously();
   } else {
-    initApp(); // start chat ONLY after auth
+    autoLoadUser(user.uid);
   }
 });
 
-let currentUser = "";
-let currentEmail = "";
+let currentUser="";
+let currentEmail="";
+let replyTo=null;
 
-/* INIT AFTER AUTH */
+/* AUTO LOAD USER */
+function autoLoadUser(uid){
+  db.ref("users/"+uid).once("value").then(snap=>{
+    let data = snap.val();
+
+    if(data && data.username && data.email){
+      currentUser = data.username;
+      currentEmail = data.email;
+
+      localStorage.setItem("chatUser", currentUser);
+      localStorage.setItem("chatEmail", currentEmail);
+
+      showChat();
+    } else {
+      initApp();
+    }
+  });
+}
+
 function initApp(){
   currentUser = localStorage.getItem("chatUser") || "";
   currentEmail = localStorage.getItem("chatEmail") || "";
@@ -104,9 +236,9 @@ function initApp(){
 }
 
 function showToast(msg){
-  toast.innerText = msg;
+  toast.innerText=msg;
   toast.style.display="block";
-  setTimeout(()=>toast.style.display="none",2500);
+  setTimeout(()=>toast.style.display="none",2000);
 }
 
 function enterChat(){
@@ -140,6 +272,15 @@ function trackPresence(){
       online:true
     });
   },5000);
+
+  db.ref("presence").on("value",snap=>{
+    let online=0;
+    snap.forEach(d=>{
+      let val=d.val();
+      if(val.online) online++;
+    });
+    status.innerText = online+" online";
+  });
 }
 
 /* TYPING */
@@ -176,8 +317,11 @@ function sendMessage(){
     name:currentUser,
     userEmail:currentEmail,
     time:Date.now(),
-    delivered:true
+    delivered:true,
+    reply: replyTo || null
   };
+
+  replyTo=null;
 
   if(file){
     let reader=new FileReader();
@@ -199,12 +343,36 @@ function sendMessage(){
 function loadMessages(){
   db.ref("messages").on("value",snap=>{
     messages.innerHTML="";
+
     snap.forEach(d=>{
       let m=d.val();
       if(!m) return;
 
       let div=document.createElement("div");
       div.className="msg "+(m.userEmail===currentEmail?"me":"other");
+
+      div.ondblclick=()=>{
+        db.ref("messages/"+m.id+"/reaction").set("❤️");
+      };
+
+      div.oncontextmenu=(e)=>{
+        e.preventDefault();
+        if(m.userEmail===currentEmail){
+          db.ref("messages/"+m.id).remove();
+        }
+      };
+
+      let startX=0;
+      div.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+      div.addEventListener("touchend",e=>{
+        let diff=e.changedTouches[0].clientX - startX;
+        if(diff>60){
+          replyTo = m.text || "📷 image";
+          showToast("Replying...");
+        }
+      });
+
+      let replyHTML = m.reply ? `<div class="reply-box">${m.reply}</div>` : "";
 
       let content=m.text || `<img src="${m.image}" class="chat-img">`;
 
@@ -217,8 +385,10 @@ function loadMessages(){
         </div>
 
         <div class="bubble">
+          ${replyHTML}
           ${content}
           ${ticks}
+          ${m.reaction ? `<div class="reaction">${m.reaction}</div>` : ""}
         </div>
       `;
 
@@ -231,4 +401,4 @@ function loadMessages(){
 </script>
 
 </body>
-</html>
+  </html>
