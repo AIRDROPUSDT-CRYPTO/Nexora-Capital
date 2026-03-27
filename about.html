@@ -48,8 +48,6 @@ body{
 .counter-box{text-align:center;margin-bottom:12px;}
 .counter{font-size:26px;color:#22c55e;font-weight:600;}
 
-.step{margin-top:10px;font-size:14px;color:#e2e8f0;}
-
 .testimonial{
   background:#020617;
   padding:14px;
@@ -80,17 +78,13 @@ body{
   line-height:1.5;
 }
 
-/* 🔥 LIKE BUTTON */
 .like-btn{
   margin-top:8px;
   font-size:12px;
   color:#94a3b8;
   cursor:pointer;
 }
-
-.like-btn:hover{
-  color:#38bdf8;
-}
+.like-btn:hover{color:#38bdf8;}
 
 .faq-item{
   border-bottom:1px solid rgba(148,163,184,0.2);
@@ -207,28 +201,8 @@ body{
     </div>
     <div class="like-btn" onclick="like(4)">👍 <span id="like4">0</span></div>
   </div>
-
 </div>
 
-</div>
-
-<script>
-
-/* LIKE SYSTEM ONLY */
-let likes = JSON.parse(localStorage.getItem("testimonialLikes")) || [0,0,0,0,0];
-
-function like(i){
-  likes[i]++;
-  localStorage.setItem("testimonialLikes", JSON.stringify(likes));
-  document.getElementById("like"+i).innerText = likes[i];
-}
-
-/* LOAD SAVED LIKES */
-likes.forEach((val,i)=>{
-  document.getElementById("like"+i).innerText = val;
-});
-
-</script>
 <!-- FAQ -->
 <div class="card">
   <div class="title">Frequently Asked Questions</div>
@@ -266,24 +240,64 @@ likes.forEach((val,i)=>{
 </div>
 
 <script>
+
+/* COUNTERS PERSIST */
+let stats = JSON.parse(localStorage.getItem("platformStats")) || {
+  users: 3842,
+  payouts: 12450000,
+  investments: 1276
+};
+
 function animate(id,target){
   let el=document.getElementById(id);
   let count=0,step=target/100;
+
   let i=setInterval(()=>{
     count+=step;
-    if(count>=target){count=target;clearInterval(i);}
+    if(count>=target){
+      count=target;
+      clearInterval(i);
+    }
     el.innerText=Math.floor(count).toLocaleString();
   },20);
 }
 
-animate("users",3842);
-animate("payouts",12450000);
-animate("investments",1276);
+animate("users", stats.users);
+animate("payouts", stats.payouts);
+animate("investments", stats.investments);
 
+/* AUTO INCREASE */
+setInterval(()=>{
+  stats.users += Math.floor(Math.random()*3);
+  stats.payouts += Math.floor(Math.random()*50000);
+  stats.investments += Math.floor(Math.random()*2);
+
+  localStorage.setItem("platformStats", JSON.stringify(stats));
+
+  document.getElementById("users").innerText = stats.users.toLocaleString();
+  document.getElementById("payouts").innerText = stats.payouts.toLocaleString();
+  document.getElementById("investments").innerText = stats.investments.toLocaleString();
+},4000);
+
+/* LIKES */
+let likes = JSON.parse(localStorage.getItem("testimonialLikes")) || [0,0,0,0,0];
+
+function like(i){
+  likes[i]++;
+  localStorage.setItem("testimonialLikes", JSON.stringify(likes));
+  document.getElementById("like"+i).innerText = likes[i];
+}
+
+likes.forEach((val,i)=>{
+  document.getElementById("like"+i).innerText = val;
+});
+
+/* FAQ */
 function toggleFAQ(el){
   el.parentElement.classList.toggle("active");
 }
+
 </script>
 
 </body>
-</html>
+    </html>
