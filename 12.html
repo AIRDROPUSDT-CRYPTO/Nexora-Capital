@@ -5,52 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>12 Days Plan</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 
 body{
-  background:linear-gradient(135deg,#020617,#0f172a,#1e293b);
-  color:#fff;
+  background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
+  color:#e2e8f0;
 }
 
-.container{padding:20px;}
+.container{
+  padding:22px;
+  max-width:500px;
+  margin:auto;
+}
+
+h2{
+  font-weight:400;
+  margin-bottom:18px;
+}
 
 .plan{
-  background:linear-gradient(135deg,#0f172a,#020617);
-  padding:18px;
-  border-radius:18px;
-  margin-bottom:15px;
-  box-shadow:
-    0 0 0 1px rgba(56,189,248,0.1),
-    0 0 25px rgba(56,189,248,0.15),
-    inset 0 0 20px rgba(255,255,255,0.02);
-  position:relative;
-  overflow:hidden;
+  padding:18px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
 }
 
-.plan::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:18px;
-  padding:1px;
-  background:linear-gradient(120deg,#38bdf8,#6366f1,#22c55e);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  opacity:0.3;
-  pointer-events:none;
+.plan h3{color:#38bdf8;font-size:18px;}
+
+.plan p{
+  font-size:13px;
+  margin:2px 0;
+  font-weight:300;
 }
 
-.plan h3{color:#38bdf8;font-size:22px;}
-
-.amount-days{color:#facc15;font-weight:700;}
-.amount-percent{color:#22c55e;font-weight:700;}
-.amount-payout{color:#a78bfa;font-weight:700;}
+.amount-days{color:#facc15;}
+.amount-percent{color:#22c55e;}
+.amount-payout{color:#a78bfa;}
 
 button{
   width:100%;
@@ -61,44 +52,23 @@ button{
   background:linear-gradient(45deg,#38bdf8,#6366f1);
   color:#fff;
   cursor:pointer;
-  font-weight:600;
 }
 
 .claim-btn{
   background:linear-gradient(45deg,#22c55e,#16a34a);
 }
 
-.popup{
-  width:300px;
-  background:#020617;
-  border-radius:18px;
-  padding:20px;
-  text-align:center;
-  border:1px solid rgba(255,255,255,0.08);
-}
-
-.popup.success{border-color:#22c55e;}
-.popup.success h3{color:#22c55e;}
-
-.popup.warning{border-color:#facc15;}
-.popup.warning h3{color:#facc15;}
-
-.popup.info{border-color:#38bdf8;}
-.popup.info h3{color:#38bdf8;}
-
-.overlay{
+.toast{
   position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  pointer-events:none;
-  transition:0.3s;
+  top:20px;
+  right:-400px;
+  transition:0.4s;
 }
 
-.overlay.show{opacity:1;pointer-events:auto;}
+.toast.show{right:20px;}
+.toast.success{color:#4ade80;}
+.toast.warning{color:#f87171;}
+.toast.info{color:#60a5fa;}
 </style>
 </head>
 
@@ -109,18 +79,15 @@ button{
 <div id="plans"></div>
 </div>
 
-<div id="overlay" class="overlay">
-  <div id="popupBox" class="popup">
-    <h3 id="popTitle"></h3>
-    <p id="popMsg"></p>
-  </div>
-</div>
+<div id="toast" class="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-functions.js";
 
+/* ✅ YOUR REAL CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
   authDomain: "betpawa-6ef7e.firebaseapp.com",
@@ -135,26 +102,30 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
+const functions = getFunctions(app);
 
-const plans=[150000,500000,1000000,5000000];
-const DAILY_PERCENT=0.0917;
+/* 🔒 BACKEND CALLS */
+const investPlan = httpsCallable(functions, "investPlan");
+const claimEarnings = httpsCallable(functions, "claimEarnings");
+
+/* ✅ REAL PERCENTAGES */
+const plans = [
+  {amount:150000, percent:15},
+  {amount:500000, percent:25},
+  {amount:1000000, percent:35},
+  {amount:5000000, percent:45}
+];
+
 const DAYS=12;
 
-let user=null;
 let investments={};
-let userData=null;
+const toast=document.getElementById("toast");
 
-const overlay=document.getElementById("overlay");
-const popupBox=document.getElementById("popupBox");
-const popTitle=document.getElementById("popTitle");
-const popMsg=document.getElementById("popMsg");
-
-function showPopup(type,title,msg){
-  popupBox.className="popup "+type;
-  popTitle.innerText=title;
-  popMsg.innerText=msg;
-  overlay.classList.add("show");
-  setTimeout(()=>overlay.classList.remove("show"),2200);
+function showToast(type,msg){
+  toast.className="toast "+type;
+  toast.innerText=msg;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),2500);
 }
 
 function format(ms){
@@ -167,22 +138,20 @@ function render(){
   const box=document.getElementById("plans");
   box.innerHTML="";
 
-  plans.forEach(amount=>{
-    let inv=investments[amount];
+  plans.forEach(p=>{
+    let inv=investments[p.amount];
     let div=document.createElement("div");
     div.className="plan";
 
     if(inv){
       let last=inv.lastClaim||inv.startTime;
       let time=(last+86400000)-Date.now();
-      let can=time<=0;
-      let daysLeft=DAYS-inv.daysClaimed;
 
       div.innerHTML=`
-        <h3>${amount.toLocaleString()} UGX</h3>
-        <p>Days Remaining: <span class="amount-days">${daysLeft}</span></p>
+        <h3>${p.amount.toLocaleString()} UGX</h3>
+        <p>Days Remaining: <span class="amount-days">${DAYS-inv.daysClaimed}</span></p>
         <p>Daily Profit: <span class="amount-percent">${Math.floor(inv.daily)} UGX</span></p>
-        <p>Expected Payout: <span class="amount-payout">${Math.floor(inv.total)} UGX</span></p>
+        <p>Total Payout: <span class="amount-payout">${Math.floor(inv.total)} UGX</span></p>
         <p>${format(time)}</p>
       `;
 
@@ -190,24 +159,24 @@ function render(){
       btn.className="claim-btn";
       btn.innerText="Receive Daily Earnings";
 
-      if(can) btn.onclick=()=>claim(amount);
+      if(time<=0) btn.onclick=()=>claim(p.amount);
       else btn.style.opacity="0.5";
 
       div.appendChild(btn);
 
     }else{
-      let total=amount*DAILY_PERCENT*DAYS;
+      let total=p.amount*(p.percent/100)*DAYS;
 
       div.innerHTML=`
-        <h3>${amount.toLocaleString()} UGX</h3>
+        <h3>${p.amount.toLocaleString()} UGX</h3>
         <p>Duration: <span class="amount-days">${DAYS} Days</span></p>
-        <p>Daily Profit: <span class="amount-percent">${(DAILY_PERCENT*100).toFixed(2)}%</span></p>
-        <p>Expected Payout: <span class="amount-payout">${Math.floor(total)} UGX</span></p>
+        <p>Daily Profit: <span class="amount-percent">${p.percent}%</span></p>
+        <p>Total Payout: <span class="amount-payout">${Math.floor(total)} UGX</span></p>
       `;
 
       let btn=document.createElement("button");
       btn.innerText="Invest Now";
-      btn.onclick=()=>invest(amount);
+      btn.onclick=()=>invest(p.amount);
 
       div.appendChild(btn);
     }
@@ -216,94 +185,26 @@ function render(){
   });
 }
 
-/* ✅ INVEST (NO withdrawableBalance TOUCH) */
 async function invest(amount){
-
-  if(!user || !userData){
-    return showPopup("info","Please wait","Loading account...");
+  try{
+    await investPlan({amount});
+    showToast("success","Investment started");
+  }catch(e){
+    showToast("warning",e.message);
   }
-
-  const uid=user.uid;
-
-  if((userData.balance||0) < amount){
-    return showPopup("warning","Low Balance","Top up your account to continue");
-  }
-
-  const total=amount*DAILY_PERCENT*DAYS;
-
-  await runTransaction(ref(db,"users/"+uid),(u)=>{
-    if(!u) return u;
-
-    if((u.balance||0) < amount){
-      return;
-    }
-
-    u.balance = (u.balance||0) - amount;
-    u.lockedBalance = (u.lockedBalance||0) + total;
-
-    return u;
-  });
-
-  await runTransaction(ref(db,"investments/"+uid+"/12days/"+amount),(d)=>{
-    if(d) return d;
-    return {
-      amount,
-      daily:amount*DAILY_PERCENT,
-      total,
-      remaining:total,
-      startTime:Date.now(),
-      lastClaim:0,
-      daysClaimed:0,
-      completed:false
-    };
-  });
-
-  showPopup("success","Success","Investment started");
 }
 
-/* ✅ CLAIM (NO withdrawableBalance TOUCH) */
 async function claim(amount){
-  const uid=user.uid;
-  let pay=0,ok=false;
-
-  await runTransaction(ref(db,"investments/"+uid+"/12days/"+amount),(d)=>{
-    if(d){
-      let last=d.lastClaim||d.startTime;
-      if(Date.now()>=last+86400000){
-        pay=Math.floor(d.daily);
-        d.lastClaim=Date.now();
-        d.daysClaimed++;
-        d.remaining-=pay;
-        d.completed=d.daysClaimed>=DAYS;
-        ok=true;
-      }
-    }
-    return d;
-  });
-
-  if(!ok) return showPopup("info","Please wait","Not yet time");
-
-  await runTransaction(ref(db,"users/"+uid),(u)=>{
-    if(!u) return u;
-
-    u.balance = (u.balance||0) + pay;
-    u.lockedBalance = (u.lockedBalance||0) - pay;
-
-    return u;
-  });
-
-  showPopup("success","Success","Earnings received");
+  try{
+    await claimEarnings({amount});
+    showToast("success","Earnings received");
+  }catch(e){
+    showToast("info",e.message);
+  }
 }
 
-/* REALTIME */
 onAuthStateChanged(auth,u=>{
-  user=u;
-
   if(u){
-    onValue(ref(db,"users/"+u.uid),snap=>{
-      userData = snap.val() || {};
-    });
-
     onValue(ref(db,"investments/"+u.uid+"/12days"),snap=>{
       let raw=snap.val()||{};
       investments={};
@@ -321,4 +222,4 @@ setInterval(render,1000);
 </script>
 
 </body>
-  </html>
+</html>
