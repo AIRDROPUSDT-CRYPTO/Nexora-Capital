@@ -14,11 +14,81 @@
 html,body{
   height:100%;
   overflow:hidden;
-  background:#e5e7eb; /* ✅ LIGHT BACKGROUND */
+  background:#e5e7eb;
   color:#111;
 }
 
-/* ✅ BRIGHT CHAT AREA */
+/* 🔥 NEW PROFESSIONAL LOGIN DESIGN */
+#login{
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: radial-gradient(circle at top,#0f172a,#020617);
+}
+
+.login-card{
+  width:340px;
+  padding:30px 25px;
+  border-radius:18px;
+  background:linear-gradient(145deg,#020617,#0f172a);
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  text-align:center;
+  border:1px solid rgba(56,189,248,0.2);
+  animation:fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.login-title{
+  font-size:20px;
+  color:#38bdf8;
+  margin-bottom:5px;
+  font-weight:600;
+}
+
+.login-sub{
+  font-size:12px;
+  color:#94a3b8;
+  margin-bottom:20px;
+}
+
+.login-card input{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  background:#020617;
+  color:#fff;
+  border:1px solid rgba(148,163,184,0.2);
+}
+
+.login-card input:focus{
+  border:1px solid #38bdf8;
+}
+
+.join-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(45deg,#38bdf8,#6366f1);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:5px;
+}
+
+.join-btn:hover{
+  opacity:0.9;
+}
+
+/* CHAT (UNCHANGED) */
 .messages{
   flex:1;
   overflow-y:auto;
@@ -30,7 +100,6 @@ html,body{
     url('https://www.transparenttextures.com/patterns/diamond-upholstery.png');
 }
 
-/* KEEP STRUCTURE SAME */
 #chatApp{height:100%;display:flex;flex-direction:column;}
 
 .header{
@@ -56,14 +125,12 @@ html,body{
   position:relative;
 }
 
-/* MY MESSAGE */
 .me{align-self:flex-end;}
 .me .bubble{
   background:#22c55e;
   color:#000;
 }
 
-/* OTHER MESSAGE */
 .other .bubble{
   background:#ffffff;
   color:#111;
@@ -84,7 +151,6 @@ html,body{
   padding:5px 10px;
 }
 
-/* INPUT */
 .input-box{
   display:flex;
   padding:8px;
@@ -127,7 +193,6 @@ html,body{
   display:none;
 }
 
-/* ✅ BETTER REPLY VISIBILITY */
 .reply-box{
   background:#dcfce7;
   padding:6px;
@@ -138,7 +203,6 @@ html,body{
   border-radius:6px;
 }
 
-/* REACTION */
 .reaction{
   position:absolute;
   bottom:-10px;
@@ -150,13 +214,20 @@ html,body{
 
 <body>
 
+<!-- 🔥 NEW LOGIN UI -->
 <div id="login">
-  <h2>Enter Username</h2>
-  <input id="username">
-  <input id="email" placeholder="Email">
-  <button onclick="enterChat()">Continue</button>
+  <div class="login-card">
+    <div class="login-title">Quantum Apex Chat</div>
+    <div class="login-sub">Join the live conversation</div>
+
+    <input id="username" placeholder="Enter username">
+    <input id="email" placeholder="Enter email">
+
+    <button class="join-btn" onclick="enterChat()">Continue</button>
+  </div>
 </div>
 
+<!-- CHAT (UNCHANGED) -->
 <div id="chatApp" style="display:none;">
   <div class="header">
     Quantum Apex Live Chat
@@ -176,6 +247,7 @@ html,body{
 
 <div id="toast" class="toast"></div>
 
+<!-- 🔒 SCRIPT (UNCHANGED) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -401,4 +473,4 @@ function loadMessages(){
 </script>
 
 </body>
-  </html>
+</html>
