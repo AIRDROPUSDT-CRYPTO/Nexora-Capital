@@ -8,120 +8,80 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body{
+  background: radial-gradient(circle at top,#020617,#0f172a 60%,#000);
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;color:#fff;
 }
 
-body {
-  background: linear-gradient(135deg,#020617,#0f172a,#1e293b);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  color: #fff;
+.header{
+  position:absolute;top:20px;width:100%;
+  text-align:center;color:#38bdf8;font-weight:600;letter-spacing:2px;
 }
 
-.container {
-  background: rgba(255,255,255,0.05);
-  padding: 30px;
-  border-radius: 15px;
-  width: 360px;
-  backdrop-filter: blur(14px);
-  text-align: center;
+.container{
+  background: linear-gradient(145deg,#020617,#0f172a);
+  padding:30px;border-radius:18px;width:360px;text-align:center;
+  box-shadow:0 0 30px rgba(56,189,248,0.15);
+  border:1px solid rgba(56,189,248,0.2);
 }
 
-h2 {
-  margin-bottom: 20px;
-  color: #38bdf8;
+h2{margin-bottom:20px;color:#38bdf8;}
+
+input{
+  width:100%;padding:12px;margin:6px 0;
+  border-radius:10px;border:none;outline:none;
+  background:#020617;color:#fff;
+  border:1px solid rgba(148,163,184,0.2);
 }
 
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 6px 0;
-  border-radius: 8px;
-  border: none;
-  outline: none;
+.phone-box{
+  display:flex;align-items:center;background:#020617;
+  border-radius:10px;overflow:hidden;
+  border:1px solid rgba(148,163,184,0.2);
 }
 
-.phone-box {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
+.phone-box span{padding:0 10px;color:#38bdf8;font-weight:600;}
+.phone-box input{border:none;flex:1;background:transparent;color:#fff;}
+
+.register-btn{
+  width:100%;padding:13px;margin-top:10px;border:none;
+  border-radius:30px;background:linear-gradient(45deg,#38bdf8,#6366f1);
+  color:#fff;cursor:pointer;
 }
 
-.phone-box span {
-  padding: 0 10px;
-  color: #000;
-  font-weight: bold;
+.loader-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;justify-content:center;align-items:center;
+  z-index:2000;
 }
+.loader{
+  width:50px;height:50px;
+  border:5px solid #38bdf8;
+  border-top:5px solid transparent;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-.phone-box input {
-  border: none;
-  flex: 1;
-  padding: 12px;
+.popup{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.85);
+  background:#020617;padding:20px 30px;border-radius:12px;
+  text-align:center;opacity:0;transition:0.25s;z-index:3000;
 }
-
-.register-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 30px;
-  background: linear-gradient(45deg,#38bdf8,#6366f1);
-  color: #fff;
-  cursor: pointer;
-}
-
-.links {
-  margin-top: 12px;
-}
-
-.links a {
-  font-size: 13px;
-  color: #94a3b8;
-  text-decoration: none;
-}
-
-.links a:hover {
-  color: #38bdf8;
-}
-
-.popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.85);
-  background: #020617;
-  padding: 20px 30px;
-  border-radius: 12px;
-  text-align: center;
-  opacity: 0;
-  transition: 0.25s ease;
-  z-index: 1000;
-}
-
-.popup.show {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.popup.success {
-  border: 2px solid #22c55e;
-}
-
-.popup.error {
-  border: 2px solid #ef4444;
-}
+.popup.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+.popup.success{border:2px solid #22c55e;}
+.popup.error{border:2px solid #ef4444;}
 </style>
 </head>
 
 <body>
+
+<div class="header">QUANTUM APEX UG</div>
 
 <div class="container">
   <h2>Create Account</h2>
@@ -131,18 +91,19 @@ input {
 
   <div class="phone-box">
     <span>🇺🇬 +256</span>
-    <input type="number" id="phone" placeholder="Phone Number">
+    <input type="text" id="phone" placeholder="7XXXXXXXX">
   </div>
 
   <input type="email" id="email" placeholder="Email Address">
   <input type="password" id="password" placeholder="Password">
   <input type="password" id="confirmPassword" placeholder="Confirm Password">
+  <input type="text" id="refCode" placeholder="Referral Code">
 
   <button class="register-btn" onclick="register()">Create Account</button>
+</div>
 
-  <div class="links">
-    <a href="login.html">Already have an account?</a>
-  </div>
+<div class="loader-overlay" id="loader">
+  <div class="loader"></div>
 </div>
 
 <div id="popup" class="popup">
@@ -151,16 +112,8 @@ input {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-import { 
-  getDatabase, 
-  ref, 
-  set 
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
@@ -177,69 +130,80 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-const params = new URLSearchParams(window.location.search);
-const refUser = params.get("ref") || "";
-
-/* POPUP */
-function showPopup(message, type){
-  const popup = document.getElementById("popup");
-  popup.className = "popup show " + type;
-  document.getElementById("popupMsg").innerText = message;
-
-  setTimeout(()=>{
-    popup.classList.remove("show");
-  },2200);
+function showPopup(msg,type){
+  const popup=document.getElementById("popup");
+  popup.className="popup show "+type;
+  document.getElementById("popupMsg").innerText=msg;
+  setTimeout(()=>popup.classList.remove("show"),2000);
 }
 
-/* REGISTER */
-window.register = function(){
-  let name = document.getElementById("name").value.trim();
-  let username = document.getElementById("username").value.trim();
-  let phone = document.getElementById("phone").value.trim();
-  let email = document.getElementById("email").value.trim();
-  let password = document.getElementById("password").value;
-  let confirmPassword = document.getElementById("confirmPassword").value;
+function formatPhone(num){
+  num=num.replace(/\D/g,"");
+  if(num.startsWith("0")) num=num.slice(1);
+  return "+256"+num;
+}
 
-  if(!name || !username || !phone || !email || !password || !confirmPassword){
-    return showPopup("Fill in the required fields","error");
-  }
+window.register = async function(){
 
-  if(password !== confirmPassword){
-    return showPopup("Passwords do not match","error");
-  }
+  const nameVal = document.getElementById("name").value.trim();
+  const usernameVal = document.getElementById("username").value.trim();
+  const phoneVal = formatPhone(document.getElementById("phone").value);
+  const emailVal = document.getElementById("email").value.trim();
+  const passwordVal = document.getElementById("password").value;
+  const confirmVal = document.getElementById("confirmPassword").value;
+  const refCodeVal = document.getElementById("refCode").value.trim().toUpperCase();
+  const loader = document.getElementById("loader");
 
-  createUserWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
+  if(!nameVal) return showPopup("Enter full name","error");
+  if(!usernameVal) return showPopup("Enter username","error");
+  if(phoneVal.length !== 13) return showPopup("Enter valid phone number","error");
+  if(!emailVal || !emailVal.includes("@")) return showPopup("Enter valid email","error");
+  if(passwordVal.length < 6) return showPopup("Password must be at least 6 characters","error");
+  if(passwordVal !== confirmVal) return showPopup("Passwords do not match","error");
+  if(!refCodeVal) return showPopup("Enter referral code","error");
 
+  loader.style.display="flex";
+
+  try{
+
+    let refSnap = await get(ref(db,"public/refCodes/"+refCodeVal));
+    if(!refSnap.exists()) throw {custom:"Invalid referral code"};
+
+    const userCredential = await createUserWithEmailAndPassword(auth,emailVal,passwordVal);
     const user = userCredential.user;
 
-    set(ref(db, "users/" + user.uid), {
-      name,
-      username,
-      phone: "+256" + phone,
-      email,
-      referral: refUser,
-      balance: 0,
-      createdAt: Date.now()
+    let newCode=Math.random().toString(36).substring(2,8).toUpperCase();
+
+    await set(ref(db,"users/"+user.uid),{
+      name:nameVal,
+      username:usernameVal,
+      phone:phoneVal,
+      email:emailVal,
+      referredBy:refCodeVal,
+      refCode:newCode,
+      balance:0,
+      createdAt:Date.now()
     });
 
+    await set(ref(db,"public/refCodes/"+newCode),user.uid);
+
     showPopup("Account created successfully","success");
+    setTimeout(()=>location.href="dashboard.html",1200);
 
-    setTimeout(()=>{
-      window.location.href = "dashboard.html";
-    },1200);
+  }catch(err){
 
-  })
-  .catch((error) => {
+    let msg = "Registration failed";
 
-    let msg = "Unable to create account";
-
-    if(error.code === "auth/email-already-in-use"){
-      msg = "Email already exists";
-    }
+    if(err.custom) msg = err.custom;
+    else if(err.code === "auth/email-already-in-use") msg = "Email already exists";
+    else if(err.code === "auth/invalid-email") msg = "Invalid email format";
+    else if(err.code === "auth/weak-password") msg = "Weak password";
+    else msg = err.message;
 
     showPopup(msg,"error");
-  });
+  }
+
+  loader.style.display="none";
 }
 </script>
 
