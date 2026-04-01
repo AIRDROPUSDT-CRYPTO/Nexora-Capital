@@ -3,7 +3,7 @@
 <head>        
 <meta charset="UTF-8">        
 <meta name="viewport" content="width=device-width, initial-scale=1.0">        
-<title>Dashboard | Quantum Apex Ug</title>        
+<title>Dashboard | Nexora Capital</title>        
         
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">        
         
@@ -199,7 +199,7 @@ body{
   <a href="investments.html">My Investments</a>        
   <a href="referral.html">Refer and Earn</a>        
   <a href="chat.html">Join Chat Room</a>        
-  <a href="about.html">About Quantum Apex</a>        
+  <a href="about.html">About Nexora Capital</a>        
 </div>        
 
 <div id="profilePanel" class="profile-panel">        
@@ -243,7 +243,7 @@ body{
       "
     >
     <div class="invest-info">
-      Quantum Apex UG is a trusted digital investment platform designed to help users grow their capital through structured plans. Our system ensures fast processing, secure transactions, and transparent profit systems. Join thousands of investors building consistent income daily.
+      Nexora Capital is a trusted digital investment platform designed to help users grow their capital through structured plans. Our system ensures fast processing, secure transactions, and transparent profit systems. Join thousands of investors building consistent income daily.
     </div>
   </div>
 </div>
@@ -333,7 +333,7 @@ function exitApp(){
   // Try closing tab (limited support)
   try {
     window.open('', '_self');
-    window.close();
+    location.href = "index.html";
   } catch(e){}
 
   // Fallback UI
@@ -557,7 +557,8 @@ onAuthStateChanged(auth,user=>{
       document.getElementById("mainBalance").innerText=formatUGX(d.balance||0);
       document.getElementById("lockedBalance").innerText=formatUGX(d.lockedBalance||0);
 
-      document.getElementById("editName").value=d.name;
+      const nameEl = document.getElementById("editName");
+if(nameEl) nameEl.value = d.name;
       document.getElementById("editPhone").value=d.phone;
       document.getElementById("editEmail").value=d.email;
     });
