@@ -62,51 +62,38 @@ body{
 
 .balance-top{
   display:flex;
-  gap:12px;
-  flex-wrap:nowrap; /* ❗ keep them on same row */
+  gap:14px; /* 🔥 slightly more spacing like screenshot */
 }
 
 .balance-card{
-  flex:1; /* equal width */
-  min-width:0; /* ✅ prevents overflow breaking layout */
+  flex:1;
+  min-width:0;
 
   background:linear-gradient(145deg,#020617,#0f172a);
   border:1px solid rgba(56,189,248,0.2);
-  padding:14px;
-  border-radius:16px;
-  box-shadow:0 0 20px rgba(56,189,248,0.15);
+  padding:18px; /* 🔥 more padding like screenshot */
+  border-radius:18px; /* 🔥 smoother corners */
+  box-shadow:0 0 25px rgba(56,189,248,0.18);
 
   display:flex;
   flex-direction:column;
   justify-content:center;
-  overflow:hidden;
 }
 
 .balance-card h4{
-  font-size:12px;
+  font-size:13px;
   color:#94a3b8;
+  margin-bottom:4px;
 }
 
 .balance-card p{
-  margin-top:6px;
-  font-size: clamp(13px, 3.2vw, 17px);
-  font-weight:600;
+  font-size: clamp(16px, 4.5vw, 22px); /* 🔥 bigger like screenshot */
+  font-weight:700; /* 🔥 bolder */
   color:#22c55e;
 
-  white-space:nowrap;      /* ✅ FORCE ONE LINE */
+  white-space:nowrap; /* keep in one line */
   overflow:hidden;
   text-overflow:ellipsis;
-}
-
-/* ✅ ONLY stack on VERY small screens */
-@media(max-width: 400px){
-  .balance-top{
-    flex-wrap:wrap;
-  }
-
-  .balance-card{
-    flex:100%;
-  }
 }
 /* 🔥 INVESTMENT IMAGE SECTION */
 .invest-section{
