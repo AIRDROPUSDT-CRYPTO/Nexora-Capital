@@ -163,149 +163,159 @@ button:hover{
   <p id="popupMsg"></p>
   <div id="popupActions" class="popup-buttons"></div>
 </div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { 
-  getDatabase, 
-  ref, 
-  onValue, 
-  update, 
-  push,
-  get
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-/* ✅ CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",
-  authDomain: "betpawa-6ef7e.firebaseapp.com",
-  databaseURL: "https://betpawa-6ef7e-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "betpawa-6ef7e",
-  storageBucket: "betpawa-6ef7e.firebasestorage.app",
-  messagingSenderId: "908050081607",
-  appId: "1:908050081607:web:db6e861fca63df78584e62",
-  measurementId: "G-C7M7HWTD01"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
-let currentBalance = 0;
-let userId = null;
-
-/* POPUP */
-function showPopup(msg,type,buttons=[]){
-  const popup=document.getElementById("popup");
-  popup.className="popup show "+type;
-  document.getElementById("popupMsg").innerText=msg;
-
-  const actions=document.getElementById("popupActions");
-  actions.innerHTML="";
-
-  buttons.forEach(btn=>{
-    let b=document.createElement("button");
-    b.innerText=btn.text;
-    b.onclick=btn.action;
-    actions.appendChild(b);
-  });
-
-  if(buttons.length===0){
-    setTimeout(()=>popup.classList.remove("show"),2500);
-  }
-}
-
-/* LOAD USER + AUTO PHONE */
-auth.onAuthStateChanged(user=>{
-  if(user){
-    userId=user.uid;
-
-    onValue(ref(db,"users/"+userId),snap=>{
-      let d=snap.val();
-      if(!d) return;
-
-      let main=d.balance||0;
-      let locked=d.lockedBalance||0;
-
-      currentBalance=main-locked;
-      if(currentBalance<0) currentBalance=0;
-
-      document.getElementById("account").value = d.phone || "";
-    });
-
-  }else{
-    location.href="login.html";
-  }
-});
-
-/* CHECK REFERRALS */
-async function checkReferrals(){
-  const snap = await get(ref(db,"users"));
-  let count = 0;
-
-  snap.forEach(u=>{
-    let d = u.val();
-    if(d.referredBy === userId && (d.totalDeposits||0) >= 20000){
-      count++;
-    }
-  });
-
-  return count;
-}
-
-/* WITHDRAW */
-window.withdraw = async function(){
-  let amount=parseFloat(amountInput.value);
-  let network=networkSelect.value;
-  let account=accountInput.value.trim();
-
-  if(!amount || !account) return showPopup("Fill all fields","error");
-  if(!network) return showPopup("Select network","error");
-  if(amount<2000) return showPopup("Minimum is 2,000 UGX","error");
-  if(amount>2000000) return showPopup("Maximum is 2,000,000 UGX","error");
-  if(amount>currentBalance) return showPopup("Insufficient balance","error");
-
-  if(amount >= 10000){
-    let refs = await checkReferrals();
-
-    if(refs < 5){
-      return showPopup(
-        "Action required to proceed",
-        "error",
-        [
-          {text:"Buy Referrals", action:()=>location.href="buyref.html"},
-          {text:"Click To Refer", action:()=>location.href="referral.html"}
-        ]
-      );
-    }
-  }
-
-  await push(ref(db,"withdrawals"),{
-    userId,
-    amount,
-    network,
-    account,
-    status:"pending",
-    createdAt:Date.now()
-  });
-
-  await update(ref(db,"users/"+userId),{
-    balance: currentBalance - amount
-  });
-
-  showPopup("Withdrawal submitted successfully","success");
-
-  amountInput.value="";
-  networkSelect.value="";
-}
-
-/* INPUTS */
-const amountInput=document.getElementById("amount");
-const networkSelect=document.getElementById("network");
-const accountInput=document.getElementById("account");
-
-</script>
+<script type="module">  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";  
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";  
+import {   
+  getDatabase,   
+  ref,   
+  onValue,   
+  update,   
+  push,  
+  get  
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";  
+  
+/* ✅ CONFIG */  
+const firebaseConfig = {  
+  apiKey: "AIzaSyCc637WbfRNZ8-0CN4sEqEnGY27-oAdGiw",  
+  authDomain: "betpawa-6ef7e.firebaseapp.com",  
+  databaseURL: "https://betpawa-6ef7e-default-rtdb.europe-west1.firebasedatabase.app",  
+  projectId: "betpawa-6ef7e",  
+  storageBucket: "betpawa-6ef7e.firebasestorage.app",  
+  messagingSenderId: "908050081607",  
+  appId: "1:908050081607:web:db6e861fca63df78584e62",  
+  measurementId: "G-C7M7HWTD01"  
+};  
+  
+const app = initializeApp(firebaseConfig);  
+const auth = getAuth(app);  
+const db = getDatabase(app);  
+  
+let currentBalance = 0;  
+let userId = null;  
+  
+/* POPUP */  
+function showPopup(msg,type,buttons=[]){  
+  const popup=document.getElementById("popup");  
+  popup.className="popup show "+type;  
+  document.getElementById("popupMsg").innerText=msg;  
+  
+  const actions=document.getElementById("popupActions");  
+  actions.innerHTML="";  
+  
+  buttons.forEach(btn=>{  
+    let b=document.createElement("button");  
+    b.innerText=btn.text;  
+    b.onclick=btn.action;  
+    actions.appendChild(b);  
+  });  
+  
+  if(buttons.length===0){  
+    setTimeout(()=>popup.classList.remove("show"),2500);  
+  }  
+}  
+  
+/* ✅ REALTIME USER SYNC (MAIN BALANCE ONLY) */  
+auth.onAuthStateChanged(user=>{  
+  if(user){  
+    userId=user.uid;  
+  
+    onValue(ref(db,"users/"+userId),snap=>{  
+      let d=snap.val();  
+      if(!d) return;  
+  
+      /* ✅ ONLY MAIN BALANCE */
+      currentBalance = Number(d.balance || 0);  
+  
+      document.getElementById("account").value = d.phone || "";  
+    });  
+  
+  }else{  
+    location.href="login.html";  
+  }  
+});  
+  
+/* CHECK REFERRALS */  
+async function checkReferrals(){  
+  const snap = await get(ref(db,"users"));  
+  let count = 0;  
+  
+  snap.forEach(u=>{  
+    let d = u.val();  
+    if(d.referredBy === userId && (d.totalDeposits||0) >= 20000){  
+      count++;  
+    }  
+  });  
+  
+  return count;  
+}  
+  
+/* ✅ WITHDRAW (SAFE + REALTIME SYNCED) */  
+window.withdraw = async function(){  
+  let amount=parseFloat(amountInput.value);  
+  let network=networkSelect.value;  
+  let account=accountInput.value.trim();  
+  
+  if(!amount || !account) return showPopup("Fill all fields","error");  
+  if(!network) return showPopup("Select network","error");  
+  if(amount<2000) return showPopup("Minimum is 2,000 UGX","error");  
+  if(amount>2000000) return showPopup("Maximum is 2,000,000 UGX","error");  
+  
+  /* ✅ ALWAYS CHECK AGAINST REALTIME MAIN BALANCE */
+  if(amount > currentBalance){  
+    return showPopup("Insufficient balance","error");  
+  }  
+  
+  if(amount >= 10000){  
+    let refs = await checkReferrals();  
+  
+    if(refs < 5){  
+      return showPopup(  
+        "Action required to proceed",  
+        "error",  
+        [  
+          {text:"Buy Referrals", action:()=>location.href="buyref.html"},  
+          {text:"Click To Refer", action:()=>location.href="referral.html"}  
+        ]  
+      );  
+    }  
+  }  
+  
+  /* ✅ GET LATEST BALANCE BEFORE DEDUCTING (ANTI-DESYNC FIX) */
+  const userSnap = await get(ref(db,"users/"+userId));  
+  let freshBalance = Number(userSnap.val()?.balance || 0);  
+  
+  if(amount > freshBalance){  
+    return showPopup("Balance updated. Try again","error");  
+  }  
+  
+  /* ✅ SAVE WITHDRAWAL */
+  await push(ref(db,"withdrawals"),{  
+    userId,  
+    amount,  
+    network,  
+    account,  
+    status:"pending",  
+    createdAt:Date.now()  
+  });  
+  
+  /* ✅ DEDUCT FROM MAIN BALANCE ONLY */
+  await update(ref(db,"users/"+userId),{  
+    balance: freshBalance - amount  
+  });  
+  
+  showPopup("Withdrawal submitted successfully","success");  
+  
+  amountInput.value="";  
+  networkSelect.value="";  
+}  
+  
+/* INPUTS */  
+const amountInput=document.getElementById("amount");  
+const networkSelect=document.getElementById("network");  
+const accountInput=document.getElementById("account");  
+  
+  </script>
 
 </body>
 </html>
