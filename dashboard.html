@@ -71,16 +71,48 @@ body{
 
 .balance-card h4{font-size:12px;color:#94a3b8;}        
 
+.balance-card{
+  flex:1;
+  background:linear-gradient(145deg,#020617,#0f172a);
+  border:1px solid rgba(56,189,248,0.2);
+  padding:14px; /* slightly reduced */
+  border-radius:16px;
+  box-shadow:0 0 20px rgba(56,189,248,0.15);
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.balance-card{
+  flex:1;
+  background:linear-gradient(145deg,#020617,#0f172a);
+  border:1px solid rgba(56,189,248,0.2);
+  padding:14px;
+  border-radius:16px;
+  box-shadow:0 0 20px rgba(56,189,248,0.15);
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  overflow:hidden; /* ✅ prevents text spilling out */
+}
+
+.balance-card h4{
+  font-size:12px;
+  color:#94a3b8;
+}
+
 .balance-card p{
   margin-top:6px;
-  font-size:18px; /* slightly smaller */
+  font-size: clamp(13px, 3.2vw, 17px); /* ✅ tighter for fitting */
   font-weight:600;
   color:#22c55e;
 
-  white-space:normal;   /* ✅ allow wrapping */
-  word-break:break-word; /* ✅ break long numbers */
+  white-space: nowrap;      /* ✅ FORCE ONE LINE */
+  overflow: hidden;         /* ✅ hide overflow */
+  text-overflow: ellipsis;  /* ✅ adds ... if too long */
 }
-
 /* 🔥 INVESTMENT IMAGE SECTION */
 .invest-section{
   padding:20px;
